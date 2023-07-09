@@ -22,7 +22,7 @@
     <p class="my-2 text-base font-normal text-stone-500 whitespace-pre-line">
       {timeline.details}
     </p>
-    <div class="flex flex-row gap-x-2">
+    <div class="flex flex-row gap-x-2 flex-wrap gap-y-2">
     {#each timeline.stack as tech}
       <span class="inline-block px-2 py-1 font-semi-bold text-white dark:text-stone-800 bg-stone-900 dark:bg-zinc-200 rounded-full select-none text-[0.8rem]">
         {tech}
