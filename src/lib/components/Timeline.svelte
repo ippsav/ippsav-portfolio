@@ -1,6 +1,6 @@
 <script lang="ts">
   import timelineData from "$lib/data/timeline";
-	import TimelineItem from "./TimelineItem.svelte";
+  import TimelineItem from "./TimelineItem.svelte";
 </script>
 
 
