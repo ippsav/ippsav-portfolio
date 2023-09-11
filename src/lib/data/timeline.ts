@@ -1,4 +1,4 @@
-import type { TimelineItem } from "$lib/types/shared";
+import type { TimelineItem } pfrom "$lib/types/shared";
 
 export default [
 	{
@@ -9,7 +9,7 @@ export default [
 		stack: ['Vue', 'Firebase', 'Node.js', 'Google Cloud', 'Elasticsearch'],
 	        details: `- I've successfully tackled diverse tasks. From implementing new features, resolving bugs and enhancing system functionality.
 - I've successfully delivered multiple well written services one of whice that allowed us from saving metrics and workloads of multiple apps.
-- I've enhanced the workflow by setting up a nix environment which manages all the dependencies of the project which made sure of all coworkers to have the same version of each dependencie (ex: NodeJs), while making it easier when onboarding new developers to setup the project locally easier`
+- I've enhanced the workflow by setting up a nix environment which manages all the dependencies of the project which made sure of all coworkers to have the same version of each dependencie (ex: NodeJs), while making it easier when onboarding new developers to setup the project locally.`
 	},
 	{
 		year: '2022',
