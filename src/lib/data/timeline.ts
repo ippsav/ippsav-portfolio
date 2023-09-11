@@ -1,4 +1,4 @@
-import type { TimelineItem } pfrom "$lib/types/shared";
+import type { TimelineItem } from "$lib/types/shared";
 
 export default [
 	{
