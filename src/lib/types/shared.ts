@@ -1,7 +1,7 @@
 export type Theme = 'light' | 'dark';
 
 
-export type TimelineItem = {
+export type TimelineItemType = {
   year: string;
   title: string;
   duration: string;

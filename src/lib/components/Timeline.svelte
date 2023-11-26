@@ -1,6 +1,8 @@
 <script lang="ts">
-  import timelineData from "$lib/data/timeline";
-  import TimelineItem from "./TimelineItem.svelte";
+  import type { TimelineItemType } from "$lib/types/shared";
+  import TimelineItem from "$lib/components/TimelineItem.svelte";
+
+  export let timelineData: TimelineItemType[];
 </script>
 
 

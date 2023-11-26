@@ -1,4 +1,4 @@
-import type { TimelineItem } from "$lib/types/shared";
+import type { TimelineItemType } from "$lib/types/shared";
 
 export default [
 	{
@@ -33,4 +33,4 @@ Important parts I worked on:
       - Creating and securing the website (hidamek.com).
       - Gaining a solid understanding of website development by placing the website on a domain creating, testing, and deploying.`
 	}
-] satisfies TimelineItem[];
+] satisfies TimelineItemType[];
