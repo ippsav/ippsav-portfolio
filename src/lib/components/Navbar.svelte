@@ -9,11 +9,14 @@
 	}
 
 	onMount(() => {
+		console.log('mounted');
 		const localTheme = localStorage.getItem('theme');
+		console.log(localTheme);
 		if (localTheme === 'dark') {
 			theme.set('dark');
+		} else {
+			theme.set('light');
 		}
-		theme.set('light');
 	});
 
 	$: {
