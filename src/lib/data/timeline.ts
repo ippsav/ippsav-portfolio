@@ -4,7 +4,7 @@ export default [
 	{
 		year: 'Present',
 		title: 'Software Developer',
-		duration: 'Jan 2023 - Present',
+		duration: 'Jan 2023 - May 2024',
 		company: 'Hypefury',
 		stack: ['Vue', 'Firebase', 'Node.js', 'Google Cloud', 'Elasticsearch'],
 	        details: `• Led development efforts across diverse tasks, implementing new features, resolving complex bugs, and
