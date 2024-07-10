@@ -2,7 +2,7 @@ import type { TimelineItemType } from "$lib/types/shared";
 
 export default [
 	{
-		year: 'Present',
+		year: '2023',
 		title: 'Software Developer',
 		duration: 'Jan 2023 - May 2024',
 		company: 'Hypefury',
