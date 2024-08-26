@@ -31,7 +31,7 @@
 <div class="w-full flex justify-end">
 	<button
 		on:click={toggleTheme}
-		class="w-8 h-8 rounded bg-stone-900 m-6 flex justify-center items-center dark:bg-stone-100"
+		class="w-8 h-8 rounded bg-black m-6 flex justify-center items-center dark:bg-white"
 	>
 		{#if $theme === 'dark'}
 			<svg

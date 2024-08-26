@@ -4,7 +4,7 @@
   import './styles.css';
 </script>
 
-<div class="app dark:bg-gray-900 bg-orange-100">
+<div class="app dark:bg-black bg-white">
   <Navbar />
   <slot />
   <Footer />

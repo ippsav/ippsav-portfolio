@@ -36,7 +36,7 @@
 </script>
 
 <div class="flex flex-row justify-between items-center w-[90%] md:w-[60%] mx-auto pb-10">
-	<div class="font-sm text-stone-900 dark:text-zinc-100">© Mehdi Boujid</div>
+	<div class="font-sm text-black dark:text-white">© Mehdi Boujid</div>
 	<div class="flex flex-row">
 		{#each socials as { icon, url }}
 			<a href={url} target="_blank" class="mr-4 last:mr-0">

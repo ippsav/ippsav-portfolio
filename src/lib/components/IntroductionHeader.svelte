@@ -1,4 +1,4 @@
-<div class="flex items-center justify-center pt-10 flex-col gap-y-2 dark:text-zinc-200">
+<div class="flex items-center justify-center pt-10 flex-col gap-y-2 text-black dark:text-white">
 	<h1 class="text-4xl font-bold">Mehdi Boujid</h1>
 	<p>Software engineer</p>
 	<p class="text-sm max-w-2xl text-center mt-2">
