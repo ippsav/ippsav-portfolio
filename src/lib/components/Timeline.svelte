@@ -1,15 +1,13 @@
 <script lang="ts">
   import type { TimelineItemType } from "$lib/types/shared";
   import TimelineItem from "$lib/components/TimelineItem.svelte";
+  import timelineData from "$lib/data/timeline";
 
-  export let timelineData: TimelineItemType[];
+  export let data: TimelineItemType[] = timelineData;
 </script>
 
-<div class="font-mono text-sm mt-12">
-  <div class="text-green-700 dark:text-green-500 mb-6">$ cat experience.log</div>
-  <div class="ml-4">
-    {#each timelineData as timeline}
-      <TimelineItem {timeline} />
-    {/each}
-  </div>
+<div>
+  {#each data as timeline}
+    <TimelineItem {timeline} />
+  {/each}
 </div>
