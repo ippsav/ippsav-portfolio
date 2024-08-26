@@ -6,7 +6,7 @@ export default [
 		title: 'Software Developer',
 		duration: 'Jan 2023 - May 2024',
 		company: 'Hypefury',
-		stack: ['Vue', 'Firebase', 'Node.js', 'Google Cloud', 'Elasticsearch'],
+		stack: ['Vue', 'Firebase', 'Node.js', 'Google Cloud', 'Elasticsearch', 'AWS', 'Docker'],
 	        details: `• Led development efforts across diverse tasks, implementing new features, resolving complex bugs, and
 enhancing overall system functionality.
 • Designed and delivered multiple high-quality services, including a robust metrics and workload tracking system for multiple applications.
@@ -18,7 +18,7 @@ enhancing overall system functionality.
 		title: 'Backend Developer',
 		duration: 'May 2022 - Aug 2022',
 		company: 'Funnelish',
-		stack: ['Golang', 'Typescript', 'Node.js', 'Google Cloud', 'Elasticsearch'],
+		stack: ['Golang', 'Typescript', 'Node.js', 'Google Cloud', 'Elasticsearch', 'Docker', 'MySQL', 'Redis'],
 		details: `Funnelish.com which is a Shopify alternative written in Go with it s own custom library that s written in Go. Important parts I worked on:
  • Engineered a comprehensive backend service for managing extension installations in a client resource
 management system, handling products, sales funnels, and related assets.

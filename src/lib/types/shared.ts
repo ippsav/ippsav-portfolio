@@ -10,3 +10,10 @@ export type TimelineItemType = {
   details: string;
 };
 
+// Add this alongside your existing types
+export type ProjectItemType = {
+    title: string;
+    description: string;
+    stack: string[];
+    githubUrl: string;
+};
