@@ -5,45 +5,36 @@
 	import Threads from '$lib/images/threads.svelte';
 	import type { ComponentType } from 'svelte';
 
-  type IconMap = {
-    [key: string]: ComponentType;
-  };
+	type IconMap = {
+		[key: string]: ComponentType;
+	};
 
 	const socials = [
-		{
-			icon: 'github',
-			url: 'https://github.com/ippsav'
-		},
-		{
-			icon: 'linkedin',
-			url: 'https://www.linkedin.com/in/mehdi-boujid-261789203/'
-		},
-		{
-			icon: 'twitter',
-			url: 'https://twitter.com/ippsav'
-		},
-		{
-			icon: 'threads',
-			url: 'https://threads.net/ippsav'
-		}
+		{ icon: 'github', url: 'https://github.com/ippsav' },
+		{ icon: 'linkedin', url: 'https://www.linkedin.com/in/mehdi-boujid-261789203/' },
+		{ icon: 'twitter', url: 'https://twitter.com/ippsav' },
+		{ icon: 'threads', url: 'https://threads.net/ippsav' }
 	];
-	const icons: IconMap = {
-		github: Github,
-		linkedin: Linkedin,
-		twitter: Twitter,
-		threads: Threads
-	};
+	const icons: IconMap = { github: Github, linkedin: Linkedin, twitter: Twitter, threads: Threads };
 </script>
 
-<div class="flex flex-row justify-between items-center w-[90%] md:w-[60%] mx-auto pb-10">
-	<div class="font-sm text-black dark:text-white">© Mehdi Boujid</div>
-	<div class="flex flex-row">
-		{#each socials as { icon, url }}
-			<a href={url} target="_blank" class="mr-4 last:mr-0">
-				<div class="w-6 h-6">
-          <svelte:component this={icons[icon]} />
-				</div>
-			</a>
-		{/each}
+<footer class="font-mono text-sm border-t border-green-500 mt-8 py-4">
+	<div class="max-w-3xl mx-auto px-4">
+		<div class="text-green-500">$ ls social/</div>
+		<div class="ml-4 flex flex-wrap gap-4 mt-2">
+			{#each socials as { icon, url }}
+				<a
+					href={url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-blue-400 hover:text-blue-300 transition-colors"
+				>
+					{icon}.link
+				</a>
+			{/each}
+		</div>
+		<div class="mt-4 text-gray-400">
+			<span class="text-green-500">$</span> echo "© {new Date().getFullYear()} Mehdi Boujid"
+		</div>
 	</div>
-</div>
+</footer>
