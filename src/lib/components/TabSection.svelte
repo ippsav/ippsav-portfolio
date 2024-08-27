@@ -1,7 +1,13 @@
 <script lang="ts">
+  import { ComponentType } from 'svelte';
   import { fade } from 'svelte/transition';
 
-  export let tabs: { title: string; content: any }[];
+  type TabsType = {
+    title: string,
+    content: ComponentType
+  };
+
+  export let tabs: TabsType[];
 
   let activeTab = 0;
 
