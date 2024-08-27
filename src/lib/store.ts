@@ -1,6 +1,4 @@
-import { writable } from "svelte/store";
-import type { Theme } from "./types/shared";
+import { writable } from 'svelte/store';
+import type { Theme } from './types/shared';
 
-
-
-export const theme = writable<Theme>("dark");
+export const theme = writable<Theme>('dark');

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { ComponentType } from 'svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
+  import type { ComponentType } from 'svelte';
 
   type TabsType = {
-    title: string,
-    content: ComponentType
+    title: string;
+    content: ComponentType;
   };
 
   export let tabs: TabsType[];
@@ -16,29 +16,34 @@
   }
 </script>
 
-<div class="text-sm mb-4 bg-white dark:bg-black text-green-700 dark:text-green-500 p-4 rounded border border-green-700 dark:border-green-500">
-  <div class="mb-4">
-    <span class="text-green-700 dark:text-green-500">$ ls sections/</span>
-    <div class="ml-4 mt-2">
-      {#each tabs as tab, index}
-        <button
-          on:click={() => selectTab(index)}
-          class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors mr-4"
-          class:font-bold={activeTab === index}
-        >
-          {tab.title}
-        </button>
-      {/each}
-    </div>
+<div
+  class="font-mono text-sm mb-4 bg-black text-green-500 p-1 rounded border border-green-500 shadow-lg"
+>
+  <div class="flex border-b border-green-500">
+    {#each tabs as tab, index}
+      <button
+        on:click={() => selectTab(index)}
+        class="px-4 py-2 transition-colors border-r border-green-500 last:border-r-0 focus:outline-none"
+        class:bg-green-600={activeTab === index}
+        class:text-black={activeTab === index}
+        class:hover:bg-green-700={activeTab !== index}
+      >
+        {tab.title}
+      </button>
+    {/each}
   </div>
-  <div class="mt-4">
-    <span class="text-green-700 dark:text-green-500">$ cat {tabs[activeTab].title}</span>
-    <div class="ml-4 mt-2">
-      {#key activeTab}
+  <div class="p-3">
+    <span class="text-green-400 opacity-75">$ cat {tabs[activeTab].title}</span>
+    {#key activeTab}
+      <div
+        in:slide={{ duration: 300, delay: 300 }}
+        out:slide={{ duration: 300 }}
+        class="mt-3 overflow-hidden"
+      >
         <div in:fade={{ duration: 150, delay: 150 }} out:fade={{ duration: 150 }}>
           <svelte:component this={tabs[activeTab].content} />
         </div>
-      {/key}
-    </div>
+      </div>
+    {/key}
   </div>
 </div>

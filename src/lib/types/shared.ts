@@ -1,6 +1,5 @@
 export type Theme = 'light' | 'dark';
 
-
 export type TimelineItemType = {
   year: string;
   title: string;
@@ -12,8 +11,8 @@ export type TimelineItemType = {
 
 // Add this alongside your existing types
 export type ProjectItemType = {
-    title: string;
-    description: string;
-    stack: string[];
-    githubUrl: string;
+  title: string;
+  description: string;
+  stack: string[];
+  githubUrl: string;
 };
