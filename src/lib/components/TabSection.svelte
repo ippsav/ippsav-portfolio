@@ -10,7 +10,7 @@
   }
 </script>
 
-<div class="font-mono text-sm mb-4 bg-white dark:bg-black text-green-700 dark:text-green-500 p-4 rounded border border-green-700 dark:border-green-500">
+<div class="text-sm mb-4 bg-white dark:bg-black text-green-700 dark:text-green-500 p-4 rounded border border-green-700 dark:border-green-500">
   <div class="mb-4">
     <span class="text-green-700 dark:text-green-500">$ ls sections/</span>
     <div class="ml-4 mt-2">

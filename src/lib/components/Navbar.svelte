@@ -32,7 +32,7 @@
 	<div class="mx-2 flex justify-end items-center">
 		<button
 			on:click={toggleTheme}
-			class="text-green-700 dark:text-green-500 hover:text-green-600 dark:hover:text-green-400 transition-colors font-mono text-sm"
+			class="text-green-700 dark:text-green-500 hover:text-green-600 dark:hover:text-green-400 transition-colors text-sm"
 		>
 			$ theme --toggle {$theme === 'dark' ? 'light' : 'dark'}
 		</button>

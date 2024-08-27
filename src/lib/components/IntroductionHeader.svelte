@@ -1,4 +1,4 @@
-<div class="font-mono text-sm mb-8">
+<div class="text-sm mb-8">
 	<div class="mb-6">
 		<div class="text-green-700 dark:text-green-500">$ whoami</div>
 		<div class="ml-4 text-black dark:text-white">

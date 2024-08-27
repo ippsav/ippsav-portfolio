@@ -4,7 +4,7 @@
 	export let timeline: TimelineItemType;
 </script>
 
-<div class="font-mono text-sm mb-8 border-l-2 border-green-700 dark:border-green-500 pl-4">
+<div class="text-sm mb-8 border-l-2 border-green-700 dark:border-green-500 pl-4">
 	<div class="flex items-start">
 			<span class="text-green-700 dark:text-green-500 mr-2">$</span>
 			<div>

@@ -18,7 +18,7 @@
 	const icons: IconMap = { github: Github, linkedin: Linkedin, twitter: Twitter, threads: Threads };
 </script>
 
-<footer class="font-mono text-sm border-t border-green-500 mt-8 py-4">
+<footer class="text-sm border-t border-green-500 mt-8 py-4">
 	<div class="max-w-3xl mx-auto px-4">
 		<div class="text-green-500">$ ls social/</div>
 		<div class="ml-4 flex flex-wrap gap-4 mt-2">
