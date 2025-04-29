@@ -2,6 +2,18 @@ import type { TimelineItemType } from '$lib/types/shared';
 
 export default [
   {
+    year: '2024',
+    title: 'Software Engineer',
+    duration: 'Dec 2024 - Mar 2025',
+    company: 'Blotato',
+    stack: ['NextJS', 'Supabase', 'NodeJS', 'Python', 'Docker'],
+    details: `• Designed a prototype for a web based Video Editor ensuring both performance and fluidity including video filters using WebGL that uses gpu
+• Resolved several bugs, including a high-memory-consumption issue that caused completed jobs in the queue to remain active in the background.
+• Improved ElevenLabs voice integration by enabling user-configurable voice parameters (e.g., pitch, speed, tone) for subtitle transcription.
+• Developed an AI agent to analyze resolved user support tickets and app documentation (GitBook), proposing PRs to improve documentation.
+• Implemented indexing for the docs GitHub repo to enhance the AI model's context awareness of file purposes and content, along with improved caching for each agent iteration, reducing processing time for 100 conversations from a couple of hours to 15-30 minutes.`
+  },
+  {
     year: '2023',
     title: 'Software Developer',
     duration: 'Jan 2023 - May 2024',
