@@ -5,8 +5,8 @@
   import TabSection from '$lib/components/TabSection.svelte';
 
   const tabs = [
-    { title: 'career.log', content: Timeline },
-    { title: 'projects.txt', content: Projects }
+    { title: 'Experience', content: Timeline },
+    { title: 'Projects', content: Projects }
   ];
 </script>
 

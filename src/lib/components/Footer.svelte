@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition';
+
   const socials = [
     { label: 'github', url: 'https://github.com/ippsav' },
     { label: 'linkedin', url: 'https://www.linkedin.com/in/mehdi-boujid-261789203/' },
@@ -7,23 +9,31 @@
   ];
 </script>
 
-<footer class="text-sm border-t border-green-500 mt-8 py-4">
+<footer
+  class="text-sm border-t border-gray-300 dark:border-gray-700 mt-12 py-6 transition-colors duration-400"
+>
   <div class="max-w-3xl mx-auto px-4">
-    <div class="text-green-500">$ ls social/</div>
-    <div class="ml-4 flex flex-wrap gap-4 mt-2">
-      {#each socials as { label, url }}
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-blue-400 hover:text-blue-300 transition-colors"
-        >
-          {label}.link
-        </a>
-      {/each}
-    </div>
-    <div class="mt-4 text-gray-400">
-      <span class="text-green-500">$</span> echo "© {new Date().getFullYear()} Mehdi Boujid"
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
+      <div class="space-y-4">
+        <h3 class="text-primary-light dark:text-primary-dark font-semibold">Connect</h3>
+        <div class="flex flex-wrap gap-4">
+          {#each socials as { label, url }, i}
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-secondary-light dark:text-secondary-dark hover:text-primary-light dark:hover:text-primary-dark transition-all duration-300 hover:underline"
+              in:fly={{ y: 10, duration: 300, delay: 100 * i }}
+            >
+              {label}
+            </a>
+          {/each}
+        </div>
+      </div>
+
+      <div class="text-secondary-light dark:text-secondary-dark text-xs">
+        © {new Date().getFullYear()} Mehdi Boujid
+      </div>
     </div>
   </div>
 </footer>

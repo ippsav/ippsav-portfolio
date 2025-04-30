@@ -5,17 +5,40 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Fira Mono', 'monospace']
+        sans: ['JetBrains Mono', 'monospace'],
+        mono: ['JetBrains Mono', 'monospace']
       },
       colors: {
-        black: '#000000',
-        white: '#FFFFFF',
+        primary: {
+          light: '#333333',
+          dark: '#F5F5F5'
+        },
+        secondary: {
+          light: '#666666',
+          dark: '#AAAAAA'
+        },
+        accent: {
+          light: '#000000',
+          dark: '#FFFFFF'
+        },
+        bg: {
+          light: '#FFFFFF',
+          dark: '#121212'
+        },
         gray: {
+          100: '#F5F5F5',
           200: '#E5E5E5',
-          400: '#A0A0A0',
-          600: '#666666',
-          800: '#333333'
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717'
         }
+      },
+      transitionDuration: {
+        400: '400ms'
       }
     }
   },
