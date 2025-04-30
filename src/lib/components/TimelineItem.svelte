@@ -30,8 +30,6 @@
     </div>
 
     <div class="flex items-center text-xs text-secondary-light dark:text-secondary-dark mb-4">
-      <span class="mr-2">{timeline.year}</span>
-      <span class="mr-2">·</span>
       <span>{timeline.duration}</span>
     </div>
 
