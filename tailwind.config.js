@@ -10,12 +10,12 @@ export default {
       },
       colors: {
         primary: {
-          light: '#333333',
-          dark: '#F5F5F5'
+          light: '#121212',
+          dark: '#FFFFFF'
         },
         secondary: {
-          light: '#666666',
-          dark: '#AAAAAA'
+          light: '#333333',
+          dark: '#DDDDDD'
         },
         accent: {
           light: '#000000',
