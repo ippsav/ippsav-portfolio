@@ -10,7 +10,7 @@ export default {
       },
       colors: {
         primary: {
-          light: '#121212',
+          light: '#000000',
           dark: '#FFFFFF'
         },
         secondary: {
@@ -23,7 +23,7 @@ export default {
         },
         bg: {
           light: '#FFFFFF',
-          dark: '#121212'
+          dark: '#000000'
         },
         gray: {
           100: '#F5F5F5',
@@ -32,13 +32,21 @@ export default {
           400: '#A3A3A3',
           500: '#737373',
           600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717'
+          700: '#333333',
+          800: '#222222',
+          900: '#111111'
         }
       },
       transitionDuration: {
         400: '400ms'
+      },
+      borderRadius: {
+        none: '0',
+        sm: '0',
+        DEFAULT: '0',
+        md: '0',
+        lg: '0',
+        full: '0'
       }
     }
   },

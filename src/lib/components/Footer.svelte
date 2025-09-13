@@ -9,30 +9,35 @@
   ];
 </script>
 
-<footer
-  class="text-sm border-t border-gray-300 dark:border-gray-700 mt-12 py-6 transition-colors duration-400"
->
-  <div class="max-w-3xl mx-auto px-4">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-      <div class="space-y-4">
-        <h3 class="text-primary-light dark:text-primary-dark font-semibold">Connect</h3>
-        <div class="flex flex-wrap gap-4">
-          {#each socials as { label, url }, i}
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-secondary-light dark:text-secondary-dark hover:text-primary-light dark:hover:text-primary-dark transition-all duration-300 hover:underline"
-              in:fly={{ y: 10, duration: 300, delay: 100 * i }}
-            >
-              {label}
-            </a>
-          {/each}
-        </div>
+<footer id="contact" class="mt-8 scroll-offset-header">
+  <div class="relative border border-white/15 p-4 bg-black/70 backdrop-blur">
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+    />
+    <div class="border-b border-white/15 pb-2 mb-4">
+      <span class="text-white text-sm">接続 / CONNECTIONS</span>
+    </div>
+
+    <div class="flex flex-col space-y-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {#each socials as { label, url }, i}
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-200 transition-colors duration-200 font-mono text-[11px] border border-white/20 px-2 py-1 hover:bg-white hover:text-black focus-ring"
+            in:fly={{ y: 10, duration: 240, delay: 90 * i }}
+            aria-label={`Open ${label} profile in new tab`}
+          >
+            &gt; {label.toUpperCase()}
+          </a>
+        {/each}
       </div>
 
-      <div class="text-secondary-light dark:text-secondary-dark text-xs">
-        © {new Date().getFullYear()} Mehdi Boujid
+      <div class="border-t border-white/10 pt-3">
+        <div class="text-gray-400 text-[11px] font-mono tracking-wide">
+          © {new Date().getFullYear()} MEHDI_BOUJID | TERMINAL_MODE_ACTIVE
+        </div>
       </div>
     </div>
   </div>

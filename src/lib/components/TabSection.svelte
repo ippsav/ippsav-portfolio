@@ -14,38 +14,67 @@
   function selectTab(index: number) {
     activeTab = index;
   }
+
+  function handleKeydown(e: KeyboardEvent) {
+    const { key } = e;
+    if (key === 'ArrowRight') {
+      e.preventDefault();
+      activeTab = (activeTab + 1) % tabs.length;
+    } else if (key === 'ArrowLeft') {
+      e.preventDefault();
+      activeTab = (activeTab - 1 + tabs.length) % tabs.length;
+    } else if (key === 'Home') {
+      e.preventDefault();
+      activeTab = 0;
+    } else if (key === 'End') {
+      e.preventDefault();
+      activeTab = tabs.length - 1;
+    }
+  }
 </script>
 
-<div
-  class="font-mono text-sm mb-4 bg-white dark:bg-black text-gray-800 dark:text-gray-200 p-1 rounded border border-gray-300 dark:border-gray-700 shadow-lg"
->
-  <div class="flex border-b border-gray-300 dark:border-gray-700">
+<div class="space-y-4">
+  <!-- Tabs -->
+  <div class="flex space-x-1" role="tablist" aria-label="Sections" on:keydown={handleKeydown}>
     {#each tabs as tab, index}
+      {@const isActive = activeTab === index}
       <button
+        id={`tab-${index}`}
+        role="tab"
+        aria-selected={isActive}
+        aria-controls={`panel-${index}`}
+        tabindex={isActive ? 0 : -1}
         on:click={() => selectTab(index)}
-        class="px-6 py-3 transition-colors border-r border-gray-300 dark:border-gray-700 last:border-r-0 focus:outline-none font-medium text-sm"
-        class:bg-gray-200={activeTab === index}
-        class:dark:bg-gray-800={activeTab === index}
-        class:text-gray-800={activeTab === index}
-        class:dark:text-white={activeTab === index}
-        class:hover:bg-gray-100={activeTab !== index}
-        class:dark:hover:bg-gray-700={activeTab !== index}
+        class="px-4 py-2 border border-white/20 transition-colors focus:outline-none text-sm tracking-wide font-mono"
+        class:bg-white={isActive}
+        class:text-black={isActive}
+        class:text-white={!isActive}
+        class:hover:bg-white={!isActive}
+        class:hover:text-black={!isActive}
       >
-        {tab.title}
+        [ {tab.title.toUpperCase()} ]
       </button>
     {/each}
   </div>
-  <div class="p-4">
+
+  <!-- Panel -->
+  <section class="border border-white/20 p-4 min-h-96 bg-black/70">
+    <div class="border-b border-white/15 pb-2 mb-4">
+      <span class="text-gray-300 font-mono tracking-wide">データ / {tabs[activeTab].title.toUpperCase()}</span>
+    </div>
     {#key activeTab}
       <div
-        in:slide={{ duration: 300, delay: 300 }}
-        out:slide={{ duration: 300 }}
+        id={`panel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${activeTab}`}
+        in:slide={{ duration: 300, delay: 200 }}
+        out:slide={{ duration: 220 }}
         class="overflow-hidden"
       >
-        <div in:fade={{ duration: 150, delay: 150 }} out:fade={{ duration: 150 }}>
+        <div in:fade={{ duration: 150, delay: 120 }} out:fade={{ duration: 120 }}>
           <svelte:component this={tabs[activeTab].content} />
         </div>
       </div>
     {/key}
-  </div>
+  </section>
 </div>

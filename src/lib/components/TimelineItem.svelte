@@ -10,40 +10,43 @@
     .map((line) => line.trim());
 </script>
 
-<div
-  class="mb-12 relative pl-8 transition-colors duration-400"
-  in:fly={{ y: 20, duration: 500, delay: 100 }}
+<article
+  class="mb-6 border border-white/20 bg-black/70 p-4 transition-colors duration-200 relative z-20 isolate transform-gpu hover:border-white/40"
+  style="backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform; contain: paint;"
+  in:fly={{ y: 20, duration: 400, delay: 80 }}
 >
-  <div class="absolute left-0 top-0 h-full">
-    <div
-      class="absolute left-0 top-0 w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-700 transform -translate-x-1/2"
-    />
-    <div
-      class="absolute left-0 top-4 bottom-0 w-px bg-gray-300 dark:bg-gray-700 transform -translate-x-1/2"
-    />
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
+  <!-- Header -->
+  <header class="border-b border-white/15 pb-2 mb-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-gray-200 text-xs font-mono tracking-wide">RECORD #{timeline.company.toUpperCase()}</h3>
+      <span class="text-gray-400 text-[10px]">{timeline.duration}</span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="space-y-3">
+    <section>
+      <div class="text-white font-mono text-sm">&gt; POSITION: {timeline.title}</div>
+      <div class="text-gray-300 font-mono text-sm">&gt; COMPANY: {timeline.company}</div>
+    </section>
+
+    <section class="text-gray-300 text-sm space-y-2">
+      <div class="text-white text-xs font-mono mb-2">RESPONSIBILITIES:</div>
+      <ul class="space-y-1" role="list">
+        {#each detailLines as line}
+          <li class="flex font-mono text-xs">
+            <span class="text-gray-400 mr-2">▶</span>
+            <span>{line}</span>
+          </li>
+        {/each}
+      </ul>
+    </section>
+
+    <section class="mt-4 pt-3 border-t border-white/10">
+      <div class="text-white text-xs font-mono mb-2">TECH_STACK:</div>
+      <TagList tags={timeline.stack} />
+    </section>
   </div>
-
-  <div class="mb-3">
-    <div class="flex flex-wrap items-center mb-2">
-      <h3 class="text-primary-light dark:text-primary-dark font-semibold mr-2">{timeline.title}</h3>
-      <span class="text-secondary-light dark:text-secondary-dark">· {timeline.company}</span>
-    </div>
-
-    <div class="flex items-center text-xs text-secondary-light dark:text-secondary-dark mb-4">
-      <span>{timeline.duration}</span>
-    </div>
-
-    <div
-      class="text-secondary-light dark:text-secondary-dark text-sm leading-relaxed mb-4 space-y-3"
-    >
-      {#each detailLines as line}
-        <div class="flex">
-          <span class="mr-2 flex-shrink-0">•</span>
-          <span>{line}</span>
-        </div>
-      {/each}
-    </div>
-
-    <TagList tags={timeline.stack} />
-  </div>
-</div>
+</article>

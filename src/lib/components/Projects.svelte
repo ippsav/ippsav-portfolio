@@ -6,8 +6,8 @@
   export let data: ProjectItemType[] = projectsData;
 </script>
 
-<div>
-  {#each data as project}
+<div role="list" aria-label="Projects">
+  {#each data as project (project.title)}
     <ProjectItem {project} />
   {/each}
 </div>

@@ -1,15 +1,20 @@
 <script>
   import Footer from '$lib/components/Footer.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
+  import FractalBackground from '$lib/components/FractalBackground.svelte';
   import '../styles.css';
 </script>
 
 <div
-  class="app bg-bg-light dark:bg-bg-dark text-primary-light dark:text-primary-dark min-h-screen flex flex-col transition-colors duration-400"
+  class="app bg-black text-white min-h-screen p-8 font-mono text-sm transition-colors duration-400 relative"
 >
-  <Navbar />
-  <main class="flex-grow px-4 md:px-8 py-8 max-w-3xl mx-auto w-full">
-    <slot />
-  </main>
-  <Footer />
+  <FractalBackground />
+  <!-- Ensure content paints above the background WebGL canvas to prevent flicker -->
+  <div class="max-w-6xl mx-auto relative z-10">
+    <Navbar />
+    <main class="mt-8">
+      <slot />
+    </main>
+    <Footer />
+  </div>
 </div>
