@@ -10,6 +10,24 @@
   ];
 </script>
 
-<IntroductionHeader />
+<div class="terminal-scanlines min-h-screen">
+  <div class="grid gap-6">
+    <!-- Terminal Header -->
+    <section id="about" class="terminal-border p-4 bg-black scroll-offset-header">
+      <div class="border-b border-white pb-2 mb-4">
+        <span class="text-gray-300 font-mono terminal-glow"
+          >mehdi@portfolio:~$ <span class="terminal-cursor" /></span
+        >
+      </div>
+      <IntroductionHeader />
+    </section>
 
-<TabSection {tabs} />
+    <!-- Main Terminal Window -->
+    <section id="work" class="terminal-border p-4 bg-black scroll-offset-header">
+      <div class="border-b border-white pb-2 mb-4">
+        <span class="text-gray-300 font-mono terminal-glow">システム / SYSTEM</span>
+      </div>
+      <TabSection {tabs} />
+    </section>
+  </div>
+</div>

@@ -6,8 +6,8 @@
   export let data: TimelineItemType[] = timelineData;
 </script>
 
-<div>
-  {#each data as timeline}
-    <TimelineItem {timeline} />
+<div role="list" aria-label="Experience timeline">
+  {#each data as timeline, i (`${timeline.year}-${timeline.company}`)}
+    <TimelineItem {timeline} index={i} />
   {/each}
 </div>

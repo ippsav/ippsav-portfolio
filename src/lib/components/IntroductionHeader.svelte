@@ -1,24 +1,62 @@
 <script>
   import { fly } from 'svelte/transition';
+  import NeuralNetwork from './NeuralNetwork.svelte';
 </script>
 
-<div class="mb-12 transition-all duration-400">
-  <div
-    class="mb-8 border-l-2 border-gray-400 dark:border-gray-600 pl-4"
-    in:fly={{ y: 20, duration: 500, delay: 200 }}
-  >
-    <h1 class="text-accent-light dark:text-accent-dark text-2xl font-bold mb-2">Mehdi Boujid</h1>
-    <h2 class="text-secondary-light dark:text-secondary-dark text-lg">Software Engineer</h2>
+<div class="space-y-6">
+  <!-- Name and Title -->
+  <div in:fly={{ y: 20, duration: 500, delay: 200 }}>
+    <div class="text-white text-lg mb-2">ユーザー / USER</div>
+    <div class="pl-4">
+      <div class="text-white font-bold">NAME: Mehdi Boujid</div>
+      <div class="text-gray-300">ROLE: Software Engineer</div>
+      <div class="text-gray-300">STATUS: Active</div>
+    </div>
   </div>
 
+  <!-- Neural Network Visualization -->
+  <div in:fly={{ y: 20, duration: 500, delay: 300 }} class="my-6">
+    <NeuralNetwork />
+    <div class="mt-3 border-t border-b border-white/15">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 text-[11px] text-gray-300 font-mono"
+      >
+        <div
+          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
+        >
+          <span
+            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
+          />
+          <span class="tracking-wide">BACKEND SYSTEMS</span>
+        </div>
+        <div
+          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
+        >
+          <span
+            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
+          />
+          <span class="tracking-wide">LOW‑LEVEL COMPUTING</span>
+        </div>
+        <div
+          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
+        >
+          <span
+            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
+          />
+          <span class="tracking-wide">CLOUD ARCHITECTURE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Section -->
   <div in:fly={{ y: 20, duration: 500, delay: 400 }}>
-    <h3 class="text-primary-light dark:text-primary-dark text-sm mb-3 font-semibold">About</h3>
-    <p class="text-secondary-light dark:text-secondary-dark text-sm leading-relaxed">
-      I am a software engineer specialized in backend technologies. Recently, I've been developing a
-      growing interest in low-level computing concepts. I have experience working with various
-      languages and technologies such as Golang, Rust, Node.js (JavaScript/TypeScript), Vue, React,
-      Docker, and Google Cloud. I continuously seek to enhance my expertise in the field and remain
-      dedicated to delivering high-quality results.
-    </p>
+    <div class="text-white mb-2">プロフィール / PROFILE</div>
+    <div class="pl-4 text-gray-300 text-sm leading-relaxed space-y-2">
+      <p>> Specialized in backend technologies and distributed systems</p>
+      <p>> Developing expertise in low-level computing concepts</p>
+      <p>> Tech stack: Golang, Rust, Node.js, TypeScript, React, Docker, GCP</p>
+      <p>> Committed to delivering high-quality, scalable solutions</p>
+    </div>
   </div>
 </div>

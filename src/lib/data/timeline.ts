@@ -2,6 +2,18 @@ import type { TimelineItemType } from '$lib/types/shared';
 
 export default [
   {
+    year: '2025',
+    title: 'Software Engineer (Contract)',
+    duration: 'May 2025 - Present',
+    company: 'NeuroAEye',
+    stack: ['Golang', 'AWS', 'NodeJS', 'Typescript', 'ECS', 'Keycloak', 'Docker'],
+    details: `• Built Go AST–based security tests that auto-discover endpoints, categorize auth levels, and enforce permission middleware on org-scoped routes—failing CI on regressions and preventing unprotected APIs.
+• Built a reusable Testcontainers-based integration test harness adopted across services: PG/Redis/Keycloak/WireMock, JWT issuance, external API mocks, automated DB setup/teardown, with +80% code coverage.
+• Optimized data handling by deduplicating queries, centralizing business logic, tightening validation, and improving default ordering for consistency.
+• Refactored services by unifying defaults, extracting shared utilities, and streamlining query performance for better maintainability and scalability.
+• Implemented password-protected Excel export for exam results with date/patient filters, multi-DB aggregation, role-based access, strong input validation, and full unit tests.`
+  },
+  {
     year: '2024',
     title: 'Software Engineer',
     duration: 'Dec 2024 - Mar 2025',

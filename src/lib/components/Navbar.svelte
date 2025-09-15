@@ -1,79 +1,138 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { theme } from '$lib/store';
-  import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { onMount, tick } from 'svelte';
 
-  function toggleTheme() {
-    theme.update((t) => (t === 'dark' ? 'light' : 'dark'));
-    localStorage.setItem('theme', $theme);
+  let menuOpen = false;
+  let rootEl: HTMLElement;
+
+  const nav = [
+    { label: 'About', href: '#about' },
+    { label: 'Work', href: '#work' },
+    { label: 'Contact', href: '#contact' }
+  ];
+
+  function setHeaderHeightVar() {
+    if (!rootEl) return;
+    const h = Math.ceil(rootEl.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--header-h', `${h}px`);
+  }
+
+  function closeMenu() {
+    menuOpen = false;
   }
 
   onMount(() => {
-    const localTheme = localStorage.getItem('theme');
-    if (localTheme === 'dark') {
-      theme.set('dark');
-    } else {
-      theme.set('light');
-    }
+    setHeaderHeightVar();
+    const ro = new ResizeObserver(() => setHeaderHeightVar());
+    ro.observe(rootEl);
+    const onResize = () => setHeaderHeightVar();
+    window.addEventListener('resize', onResize);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', onResize);
+    };
   });
 
-  $: {
-    if (browser) {
-      if ($theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }
+  $: (async () => {
+    // Recompute after menu toggle to keep var accurate on mobile
+    await tick();
+    setHeaderHeightVar();
+  })();
 </script>
 
-<nav
-  class="p-4 border-b border-gray-300 dark:border-gray-700 sticky top-0 backdrop-blur-sm bg-bg-light/90 dark:bg-bg-dark/90 z-10 transition-colors duration-400"
->
-  <div class="mx-2 flex justify-end items-center">
-    <button
-      on:click={toggleTheme}
-      class="text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-all duration-400 py-2 px-3 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
-      aria-label="Toggle theme"
-    >
-      {#if $theme === 'dark'}
-        <span class="flex items-center gap-2">
+<header class="sticky top-0 z-50 mb-8" bind:this={rootEl}>
+  <!-- Shell -->
+  <div
+    class="relative border border-white/15 bg-black/70 backdrop-blur px-3 sm:px-4 py-2 select-none"
+  >
+    <!-- Accent line -->
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+    />
+
+    <div class="flex items-center justify-between gap-3">
+      <!-- Brand -->
+      <a href="/" class="flex items-center gap-2 group shrink-0">
+        <div
+          class="h-7 w-7 grid place-items-center border border-white/25 text-[10px] text-gray-200 group-hover:bg-white group-hover:text-black transition-colors duration-200"
+        >
+          MB
+        </div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-white text-sm tracking-wide group-hover:text-gray-200">Mehdi Boujid</div>
+          <div class="text-gray-400 text-[10px]">Software Engineer</div>
+        </div>
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-1 font-mono">
+        {#each nav as item}
+          <a
+            href={item.href}
+            class="px-3 py-1 text-[11px] tracking-wide text-gray-300 border border-white/15 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
+          >
+            {item.label.toUpperCase()}
+          </a>
+        {/each}
+      </nav>
+
+      <!-- Right controls -->
+      <div class="flex items-center gap-2">
+        <a
+          href="#contact"
+          class="hidden sm:inline-flex items-center gap-2 px-3 py-1 text-[11px] tracking-wide border border-white hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
+        >
+          > GET IN TOUCH
+        </a>
+        <button
+          class="md:hidden inline-flex items-center gap-2 px-2 py-1 border border-white/20 text-gray-300 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav"
+          on:click={() => (menuOpen = !menuOpen)}
+          aria-label="Toggle navigation"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            stroke-width="2"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <span class="text-xs">Light mode</span>
-        </span>
-      {:else}
-        <span class="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-            />
-          </svg>
-          <span class="text-xs">Dark mode</span>
-        </span>
-      {/if}
-    </button>
+          <span class="text-[11px]">MENU</span>
+        </button>
+      </div>
+    </div>
   </div>
-</nav>
+
+  <!-- Mobile menu -->
+  {#if menuOpen}
+    <div
+      in:fade={{ duration: 120 }}
+      out:fade={{ duration: 100 }}
+      id="mobile-nav"
+      class="md:hidden border border-t-0 border-white/15 bg-black/95 backdrop-blur px-3 py-2"
+    >
+      <div class="flex flex-col gap-2 font-mono">
+        {#each nav as item}
+          <a
+            href={item.href}
+            class="px-3 py-2 text-sm text-gray-200 border border-white/15 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
+            on:click={closeMenu}
+          >
+            {item.label}
+          </a>
+        {/each}
+        <a
+          href="#contact"
+          class="px-3 py-2 text-sm text-gray-200 border border-white hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
+          on:click={closeMenu}
+        >
+          Get in touch
+        </a>
+      </div>
+    </div>
+  {/if}
+</header>
