@@ -2,7 +2,9 @@
   import type { TimelineItemType } from '$lib/types/shared';
   import TagList from './TagList.svelte';
   import { fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
   export let timeline: TimelineItemType;
+  export let index: number = 0;
 
   $: detailLines = timeline.details
     .split('•')
@@ -13,7 +15,7 @@
 <article
   class="mb-6 border border-white/20 bg-black/70 p-4 transition-colors duration-200 relative z-20 isolate transform-gpu hover:border-white/40"
   style="backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform; contain: paint;"
-  in:fly={{ y: 20, duration: 400, delay: 80 }}
+  in:fly={{ y: 20, duration: 900, delay: 180 + index * 120, easing: cubicOut }}
 >
   <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 

@@ -7,7 +7,7 @@
 </script>
 
 <div role="list" aria-label="Projects">
-  {#each data as project (project.title)}
-    <ProjectItem {project} />
+  {#each data as project, i (project.title)}
+    <ProjectItem {project} index={i} />
   {/each}
 </div>

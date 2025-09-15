@@ -7,7 +7,7 @@
 </script>
 
 <div role="list" aria-label="Experience timeline">
-  {#each data as timeline (`${timeline.year}-${timeline.company}`)}
-    <TimelineItem {timeline} />
+  {#each data as timeline, i (`${timeline.year}-${timeline.company}`)}
+    <TimelineItem {timeline} index={i} />
   {/each}
 </div>
