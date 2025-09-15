@@ -3,7 +3,11 @@
   import ProjectItem from '$lib/components/ProjectItem.svelte';
   import projectsData from '$lib/data/projects';
 
-  export let data: ProjectItemType[] = projectsData;
+  interface Props {
+    data?: ProjectItemType[];
+  }
+
+  let { data = projectsData }: Props = $props();
 </script>
 
 <div role="list" aria-label="Projects">

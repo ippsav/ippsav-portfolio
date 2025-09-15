@@ -1,8 +1,13 @@
-<script>
+<script lang="ts">
   import Footer from '$lib/components/Footer.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import FractalBackground from '$lib/components/FractalBackground.svelte';
   import '../styles.css';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 </script>
 
 <div
@@ -13,7 +18,7 @@
   <div class="max-w-6xl mx-auto relative z-10">
     <Navbar />
     <main class="mt-8">
-      <slot />
+      {@render children?.()}
     </main>
     <Footer />
   </div>

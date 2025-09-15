@@ -3,13 +3,19 @@
   import TagList from './TagList.svelte';
   import { fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  export let timeline: TimelineItemType;
-  export let index: number = 0;
+  interface Props {
+    timeline: TimelineItemType;
+    index?: number;
+  }
 
-  $: detailLines = timeline.details
-    .split('•')
-    .filter((line) => line.trim())
-    .map((line) => line.trim());
+  let { timeline, index = 0 }: Props = $props();
+
+  let detailLines = $derived(
+    timeline.details
+      .split('•')
+      .filter((line) => line.trim())
+      .map((line) => line.trim())
+  );
 </script>
 
 <article
@@ -17,12 +23,16 @@
   style="backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform; contain: paint;"
   in:fly={{ y: 20, duration: 900, delay: 180 + index * 120, easing: cubicOut }}
 >
-  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+  <div
+    class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+  ></div>
 
   <!-- Header -->
   <header class="border-b border-white/15 pb-2 mb-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-gray-200 text-xs font-mono tracking-wide">RECORD #{timeline.company.toUpperCase()}</h3>
+      <h3 class="text-gray-200 text-xs font-mono tracking-wide">
+        RECORD #{timeline.company.toUpperCase()}
+      </h3>
       <span class="text-gray-400 text-[10px]">{timeline.duration}</span>
     </div>
   </header>

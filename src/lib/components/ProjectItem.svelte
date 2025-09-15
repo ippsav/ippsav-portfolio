@@ -3,8 +3,12 @@
   import TagList from './TagList.svelte';
   import { fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  export let project: ProjectItemType;
-  export let index: number = 0;
+  interface Props {
+    project: ProjectItemType;
+    index?: number;
+  }
+
+  let { project, index = 0 }: Props = $props();
 </script>
 
 <article
@@ -12,7 +16,9 @@
   style="backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform; contain: paint;"
   in:fly={{ y: 20, duration: 900, delay: 180 + index * 120, easing: cubicOut }}
 >
-  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+  <div
+    class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+  ></div>
 
   <!-- Header -->
   <header class="border-b border-white/15 pb-2 mb-4">

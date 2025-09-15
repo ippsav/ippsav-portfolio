@@ -24,25 +24,19 @@
         <div
           class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
         >
-          <span
-            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
-          />
+          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
           <span class="tracking-wide">BACKEND SYSTEMS</span>
         </div>
         <div
           class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
         >
-          <span
-            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
-          />
+          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
           <span class="tracking-wide">LOW‑LEVEL COMPUTING</span>
         </div>
         <div
           class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
         >
-          <span
-            class="h-[2px] w-3 bg-white/40 group-hover:bg-black"
-          />
+          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
           <span class="tracking-wide">CLOUD ARCHITECTURE</span>
         </div>
       </div>

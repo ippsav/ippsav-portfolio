@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { fade } from 'svelte/transition';
   import { onMount, tick } from 'svelte';
 
-  let menuOpen = false;
-  let rootEl: HTMLElement;
+  let menuOpen = $state(false);
+  let rootEl: HTMLElement = $state();
 
   const nav = [
     { label: 'About', href: '#about' },
@@ -33,11 +35,13 @@
     };
   });
 
-  $: (async () => {
-    // Recompute after menu toggle to keep var accurate on mobile
-    await tick();
-    setHeaderHeightVar();
-  })();
+  run(() => {
+    (async () => {
+      // Recompute after menu toggle to keep var accurate on mobile
+      await tick();
+      setHeaderHeightVar();
+    })();
+  });
 </script>
 
 <header class="sticky top-0 z-50 mb-8" bind:this={rootEl}>
@@ -48,7 +52,7 @@
     <!-- Accent line -->
     <div
       class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
-    />
+    ></div>
 
     <div class="flex items-center justify-between gap-3">
       <!-- Brand -->
@@ -88,7 +92,7 @@
           class="md:hidden inline-flex items-center gap-2 px-2 py-1 border border-white/20 text-gray-300 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
-          on:click={() => (menuOpen = !menuOpen)}
+          onclick={() => (menuOpen = !menuOpen)}
           aria-label="Toggle navigation"
         >
           <svg
@@ -120,7 +124,7 @@
           <a
             href={item.href}
             class="px-3 py-2 text-sm text-gray-200 border border-white/15 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-            on:click={closeMenu}
+            onclick={closeMenu}
           >
             {item.label}
           </a>
@@ -128,7 +132,7 @@
         <a
           href="#contact"
           class="px-3 py-2 text-sm text-gray-200 border border-white hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-          on:click={closeMenu}
+          onclick={closeMenu}
         >
           Get in touch
         </a>

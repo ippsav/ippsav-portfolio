@@ -3,7 +3,11 @@
   import TimelineItem from '$lib/components/TimelineItem.svelte';
   import timelineData from '$lib/data/timeline';
 
-  export let data: TimelineItemType[] = timelineData;
+  interface Props {
+    data?: TimelineItemType[];
+  }
+
+  let { data = timelineData }: Props = $props();
 </script>
 
 <div role="list" aria-label="Experience timeline">

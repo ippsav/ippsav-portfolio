@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let skills: string[] = [];
-  export let label = 'skills';
+  interface Props {
+    skills?: string[];
+    label?: string;
+  }
+
+  let { skills = [], label = 'skills' }: Props = $props();
 </script>
 
 <div class="mt-3">

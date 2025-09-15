@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let tags: string[] = [];
-  export let label = '';
+  interface Props {
+    tags?: string[];
+    label?: string;
+  }
+
+  let { tags = [], label = '' }: Props = $props();
 </script>
 
 <div class="mt-2">

@@ -13,7 +13,7 @@
   <div class="relative border border-white/15 p-4 bg-black/70 backdrop-blur">
     <div
       class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
-    />
+    ></div>
     <div class="border-b border-white/15 pb-2 mb-4">
       <span class="text-white text-sm">接続 / CONNECTIONS</span>
     </div>

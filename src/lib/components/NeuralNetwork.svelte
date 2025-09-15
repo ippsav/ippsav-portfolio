@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import * as THREE from 'three';
 
-  let container: HTMLDivElement;
+  let container: HTMLDivElement | undefined = $state();
   let scene: THREE.Scene;
   let camera: THREE.OrthographicCamera;
   let renderer: THREE.WebGLRenderer;
@@ -84,6 +84,8 @@
   });
 
   function init() {
+    if (!container) return;
+
     scene = new THREE.Scene();
 
     camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -133,11 +135,11 @@
   }
 </script>
 
-<svelte:window on:resize={handleResize} />
+<svelte:window onresize={handleResize} />
 
 <div
   bind:this={container}
   class="w-full h-48 border border-white/20"
   style="min-height: 192px; background: transparent;"
   aria-hidden="true"
-/>
+></div>

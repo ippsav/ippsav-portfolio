@@ -16,7 +16,7 @@
     <section id="about" class="terminal-border p-4 bg-black scroll-offset-header">
       <div class="border-b border-white pb-2 mb-4">
         <span class="text-gray-300 font-mono terminal-glow"
-          >mehdi@portfolio:~$ <span class="terminal-cursor" /></span
+          >mehdi@portfolio:~$ <span class="terminal-cursor"></span></span
         >
       </div>
       <IntroductionHeader />
