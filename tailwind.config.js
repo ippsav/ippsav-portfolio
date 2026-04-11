@@ -5,40 +5,28 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['JetBrains Mono', 'monospace'],
-        mono: ['JetBrains Mono', 'monospace']
+        sans: [
+          'Inter',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif'
+        ],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
       },
       colors: {
-        primary: {
-          light: '#000000',
-          dark: '#FFFFFF'
-        },
-        secondary: {
-          light: '#333333',
-          dark: '#DDDDDD'
-        },
-        accent: {
-          light: '#000000',
-          dark: '#FFFFFF'
-        },
-        bg: {
-          light: '#FFFFFF',
-          dark: '#000000'
-        },
-        gray: {
-          100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
-          600: '#525252',
-          700: '#333333',
-          800: '#222222',
-          900: '#111111'
-        }
+        bg: 'var(--bg)',
+        fg: 'var(--fg)',
+        'fg-muted': 'var(--fg-muted)',
+        'fg-subtle': 'var(--fg-subtle)',
+        line: 'var(--border)',
+        'line-hover': 'var(--border-hover)'
       },
-      transitionDuration: {
-        400: '400ms'
+      maxWidth: {
+        content: '44rem'
       },
       borderRadius: {
         none: '0',

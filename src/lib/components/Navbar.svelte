@@ -1,142 +1,31 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import { fade } from 'svelte/transition';
-  import { onMount, tick } from 'svelte';
-
-  let menuOpen = $state(false);
-  let rootEl: HTMLElement = $state();
-
   const nav = [
-    { label: 'About', href: '#about' },
     { label: 'Work', href: '#work' },
+    { label: 'Projects', href: '#projects' },
     { label: 'Contact', href: '#contact' }
   ];
-
-  function setHeaderHeightVar() {
-    if (!rootEl) return;
-    const h = Math.ceil(rootEl.getBoundingClientRect().height);
-    document.documentElement.style.setProperty('--header-h', `${h}px`);
-  }
-
-  function closeMenu() {
-    menuOpen = false;
-  }
-
-  onMount(() => {
-    setHeaderHeightVar();
-    const ro = new ResizeObserver(() => setHeaderHeightVar());
-    ro.observe(rootEl);
-    const onResize = () => setHeaderHeightVar();
-    window.addEventListener('resize', onResize);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', onResize);
-    };
-  });
-
-  run(() => {
-    (async () => {
-      // Recompute after menu toggle to keep var accurate on mobile
-      await tick();
-      setHeaderHeightVar();
-    })();
-  });
 </script>
 
-<header class="sticky top-0 z-50 mb-8" bind:this={rootEl}>
-  <!-- Shell -->
+<header class="sticky top-0 z-50 border-b border-line bg-bg/80 backdrop-blur">
   <div
-    class="relative border border-white/15 bg-black/70 backdrop-blur px-3 sm:px-4 py-2 select-none"
+    class="mx-auto flex w-full max-w-content items-center justify-between px-6 py-5 sm:px-8"
   >
-    <!-- Accent line -->
-    <div
-      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
-    ></div>
-
-    <div class="flex items-center justify-between gap-3">
-      <!-- Brand -->
-      <a href="/" class="flex items-center gap-2 group shrink-0">
-        <div
-          class="h-7 w-7 grid place-items-center border border-white/25 text-[10px] text-gray-200 group-hover:bg-white group-hover:text-black transition-colors duration-200"
-        >
-          MB
-        </div>
-        <div class="hidden sm:block leading-tight">
-          <div class="text-white text-sm tracking-wide group-hover:text-gray-200">Mehdi Boujid</div>
-          <div class="text-gray-400 text-[10px]">Senior Software Engineer</div>
-        </div>
-      </a>
-
-      <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-1 font-mono">
-        {#each nav as item}
-          <a
-            href={item.href}
-            class="px-3 py-1 text-[11px] tracking-wide text-gray-300 border border-white/15 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-          >
-            {item.label.toUpperCase()}
-          </a>
-        {/each}
-      </nav>
-
-      <!-- Right controls -->
-      <div class="flex items-center gap-2">
-        <a
-          href="#contact"
-          class="hidden sm:inline-flex items-center gap-2 px-3 py-1 text-[11px] tracking-wide border border-white hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-        >
-          > GET IN TOUCH
-        </a>
-        <button
-          class="md:hidden inline-flex items-center gap-2 px-2 py-1 border border-white/20 text-gray-300 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-          aria-expanded={menuOpen}
-          aria-controls="mobile-nav"
-          onclick={() => (menuOpen = !menuOpen)}
-          aria-label="Toggle navigation"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <span class="text-[11px]">MENU</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mobile menu -->
-  {#if menuOpen}
-    <div
-      in:fade={{ duration: 120 }}
-      out:fade={{ duration: 100 }}
-      id="mobile-nav"
-      class="md:hidden border border-t-0 border-white/15 bg-black/95 backdrop-blur px-3 py-2"
+    <a
+      href="#top"
+      class="text-[13px] font-medium tracking-tight text-fg hover:text-fg-muted transition-colors focus-ring"
     >
-      <div class="flex flex-col gap-2 font-mono">
-        {#each nav as item}
-          <a
-            href={item.href}
-            class="px-3 py-2 text-sm text-gray-200 border border-white/15 hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-            onclick={closeMenu}
-          >
-            {item.label}
-          </a>
-        {/each}
+      Mehdi Boujid
+    </a>
+
+    <nav class="flex items-center gap-6 text-[13px] text-fg-muted">
+      {#each nav as item}
         <a
-          href="#contact"
-          class="px-3 py-2 text-sm text-gray-200 border border-white hover:bg-white hover:text-black transition-colors duration-200 focus-ring"
-          onclick={closeMenu}
+          href={item.href}
+          class="hover:text-fg transition-colors focus-ring"
         >
-          Get in touch
+          {item.label}
         </a>
-      </div>
-    </div>
-  {/if}
+      {/each}
+    </nav>
+  </div>
 </header>

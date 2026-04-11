@@ -1,115 +1,120 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
-  import NeuralNetwork from './NeuralNetwork.svelte';
-
-  const skillGroups: { label: string; items: string[] }[] = [
+  const skillGroups: { label: string; items: string }[] = [
     {
-      label: 'LANGUAGES',
-      items: ['Golang', 'Rust', 'Zig', 'TypeScript', 'JavaScript', 'Python', 'C++']
+      label: 'Languages',
+      items: 'Golang, Rust, Zig, TypeScript, JavaScript, Python, C++'
     },
     {
-      label: 'FRONTEND',
-      items: ['Svelte', 'React', 'Vue', 'Next.js', 'Node.js', 'WebGL']
+      label: 'Frontend',
+      items: 'Svelte, React, Vue, Next.js, Node.js, WebGL'
     },
     {
-      label: 'INFRASTRUCTURE',
-      items: ['AWS', 'GCP', 'Cloudflare', 'Docker', 'Nix', 'CI/CD', 'Serverless']
+      label: 'Infrastructure',
+      items: 'AWS, GCP, Cloudflare, Docker, Nix, CI/CD, Serverless'
     },
     {
-      label: 'DATABASES',
-      items: ['PostgreSQL', 'Redis', 'MySQL', 'Elasticsearch', 'Supabase']
+      label: 'Databases',
+      items: 'PostgreSQL, Redis, MySQL, Elasticsearch, Supabase'
     },
     {
-      label: 'AI / SEARCH',
-      items: ['LLM Integration', 'Agentic Pipelines', 'RAG', 'Vector Search', 'NL Query Parsing']
+      label: 'AI / Search',
+      items: 'LLM integration, agentic pipelines, RAG, vector search, NL query parsing'
     },
     {
-      label: 'TOOLS',
-      items: ['Keycloak', 'Testcontainers', 'WireMock', 'Delve', 'FFmpeg', 'ElevenLabs']
+      label: 'Tools',
+      items: 'Keycloak, Testcontainers, WireMock, Delve, FFmpeg, ElevenLabs'
     }
   ];
 </script>
 
-<div class="space-y-6">
-  <!-- Name and Title -->
-  <div in:fly={{ y: 20, duration: 500, delay: 200 }}>
-    <div class="text-white text-lg mb-2">ユーザー / USER</div>
-    <div class="pl-4">
-      <div class="text-white font-bold">NAME: Mehdi Boujid</div>
-      <div class="text-gray-300">ROLE: Senior Software Engineer</div>
-      <div class="text-gray-300">LOCATION: Casablanca, Morocco</div>
-      <div class="text-gray-300">STATUS: Active</div>
+<section class="scroll-offset-header space-y-16">
+  <!-- Hero -->
+  <div class="space-y-8">
+    <div class="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
+      Mehdi Boujid · Casablanca, Morocco
     </div>
-  </div>
 
-  <!-- Neural Network Visualization -->
-  <div in:fly={{ y: 20, duration: 500, delay: 300 }} class="my-6">
-    <NeuralNetwork />
-    <div class="mt-3 border-t border-b border-white/15">
-      <div
-        class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 text-[11px] text-gray-300 font-mono"
+    <h1
+      class="max-w-[34ch] text-[28px] font-medium leading-[1.15] tracking-tight text-fg sm:text-[36px]"
+    >
+      Senior software engineer building scalable backend systems and
+      AI&#8209;powered products.
+    </h1>
+
+    <div class="flex items-center gap-2 font-mono text-[11px] text-fg-muted">
+      <span class="relative flex h-1.5 w-1.5">
+        <span
+          class="absolute inline-flex h-full w-full animate-ping rounded-full bg-fg-muted opacity-60"
+        ></span>
+        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-fg"></span>
+      </span>
+      Available for new work
+    </div>
+
+    <div class="max-w-[60ch] space-y-4 text-fg-muted">
+      <p>
+        I build production systems in Golang and integrate LLMs into real
+        products — natural-language search, agentic pipelines, and
+        high-performance APIs.
+      </p>
+      <p>
+        Five years of experience at remote-first companies across Europe and
+        the US. I care about tight feedback loops, sharp abstractions, and
+        code that stays readable a year later.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[12px] text-fg-muted">
+      <a
+        href="https://github.com/ippsav"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline decoration-fg-subtle underline-offset-4 hover:text-fg hover:decoration-fg transition-colors focus-ring"
       >
-        <div
-          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
-        >
-          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
-          <span class="tracking-wide">BACKEND SYSTEMS</span>
-        </div>
-        <div
-          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
-        >
-          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
-          <span class="tracking-wide">AI / LLM INTEGRATION</span>
-        </div>
-        <div
-          class="px-3 py-2 flex items-center justify-center gap-2 group hover:text-black hover:bg-white transition-colors duration-200"
-        >
-          <span class="h-[2px] w-3 bg-white/40 group-hover:bg-black"></span>
-          <span class="tracking-wide">DISTRIBUTED SYSTEMS</span>
-        </div>
-      </div>
+        GitHub →
+      </a>
+      <a
+        href="https://www.linkedin.com/in/mehdi-boujid-261789203/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline decoration-fg-subtle underline-offset-4 hover:text-fg hover:decoration-fg transition-colors focus-ring"
+      >
+        LinkedIn →
+      </a>
+      <a
+        href="https://twitter.com/ippsav"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline decoration-fg-subtle underline-offset-4 hover:text-fg hover:decoration-fg transition-colors focus-ring"
+      >
+        Twitter →
+      </a>
+      <a
+        href="mailto:mehdiboujid@gmail.com"
+        class="underline decoration-fg-subtle underline-offset-4 hover:text-fg hover:decoration-fg transition-colors focus-ring"
+      >
+        Email →
+      </a>
     </div>
   </div>
 
-  <!-- About Section -->
-  <div in:fly={{ y: 20, duration: 500, delay: 400 }}>
-    <div class="text-white mb-2">プロフィール / PROFILE</div>
-    <div class="pl-4 text-gray-300 text-sm leading-relaxed space-y-2">
-      <p>
-        &gt; Senior software engineer with 5 years of experience building scalable backend systems
-        and AI-powered products.
-      </p>
-      <p>
-        &gt; Specialized in Golang, distributed systems, and LLM integration — with production
-        experience shipping natural-language search, agentic pipelines, and high-performance APIs.
-      </p>
-      <p>
-        &gt; Working remote-first with companies across Europe and the US.
-      </p>
+  <!-- Skills -->
+  <div class="space-y-6">
+    <div class="flex items-baseline justify-between border-b border-line pb-3">
+      <h2 class="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-muted">
+        Skills
+      </h2>
     </div>
-  </div>
 
-  <!-- Skills Section -->
-  <div in:fly={{ y: 20, duration: 500, delay: 500 }}>
-    <div class="text-white mb-2">スキル / SKILLS</div>
-    <div class="pl-4 space-y-3">
+    <dl class="space-y-4">
       {#each skillGroups as group}
-        <div class="space-y-1">
-          <div class="text-gray-400 text-[10px] font-mono tracking-wider">
-            &gt; {group.label}
-          </div>
-          <ul class="flex flex-wrap gap-1.5" role="list" aria-label={`${group.label} skills`}>
-            {#each group.items as item}
-              <li>
-                <span
-                  class="inline-flex items-center text-[10px] leading-none px-1.5 py-1 border border-white/15 text-gray-300 font-mono hover:bg-white hover:text-black hover:border-white transition-colors duration-200"
-                  >{item}</span
-                >
-              </li>
-            {/each}
-          </ul>
+        <div class="grid grid-cols-1 gap-1 sm:grid-cols-[10rem_1fr] sm:gap-6">
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-fg-subtle sm:pt-0.5">
+            {group.label}
+          </dt>
+          <dd class="text-[14px] text-fg-muted">{group.items}</dd>
         </div>
       {/each}
-    </div>
+    </dl>
   </div>
-</div>
+</section>
