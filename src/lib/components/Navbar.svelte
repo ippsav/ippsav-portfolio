@@ -64,7 +64,7 @@
         </div>
         <div class="hidden sm:block leading-tight">
           <div class="text-white text-sm tracking-wide group-hover:text-gray-200">Mehdi Boujid</div>
-          <div class="text-gray-400 text-[10px]">Software Engineer</div>
+          <div class="text-gray-400 text-[10px]">Senior Software Engineer</div>
         </div>
       </a>
 

@@ -3,71 +3,91 @@ import type { TimelineItemType } from '$lib/types/shared';
 export default [
   {
     year: '2025',
+    title: 'Senior Software Engineer',
+    duration: 'Oct 2025 – Feb 2026',
+    company: 'Ygotrips',
+    stack: [
+      'Golang',
+      'PostgreSQL',
+      'ltree',
+      'LLMs',
+      'Agentic Pipelines',
+      'Peakwork API',
+      'Delve'
+    ],
+    details: `• Architected a destination hierarchy system using PostgreSQL ltrees, redesigning the core schema and refactoring the codebase to support parent/child relationships across countries, regions, and cities.
+• Built a micro-agent that suggests alternative destinations using available inventory as context, gracefully handling zero-result scenarios for user-selected travel periods.
+• Optimized the natural-language trip search pipeline, reducing page load times from 10+ seconds to 3–6 seconds, with cached results loading in 1–2 seconds.
+• Integrated and optimized Peakwork API results (flights, hotels), improving result relevance and delivery speed.
+• Diagnosed and resolved a critical geolocation bug causing incorrect airport lookups in dense metro areas (e.g. Dubai); simultaneously identified a race condition during investigation using Delve.`
+  },
+  {
+    year: '2025',
     title: 'Software Engineer (Contract)',
-    duration: 'May 2025 - Present',
+    duration: 'May 2025 – Oct 2025',
     company: 'NeuroAEye',
-    stack: ['Golang', 'AWS', 'NodeJS', 'Typescript', 'ECS', 'Keycloak', 'Docker'],
-    details: `• Built Go AST–based security tests that auto-discover endpoints, categorize auth levels, and enforce permission middleware on org-scoped routes—failing CI on regressions and preventing unprotected APIs.
-• Built a reusable Testcontainers-based integration test harness adopted across services: PG/Redis/Keycloak/WireMock, JWT issuance, external API mocks, automated DB setup/teardown, with +80% code coverage.
-• Optimized data handling by deduplicating queries, centralizing business logic, tightening validation, and improving default ordering for consistency.
-• Refactored services by unifying defaults, extracting shared utilities, and streamlining query performance for better maintainability and scalability.
-• Implemented password-protected Excel export for exam results with date/patient filters, multi-DB aggregation, role-based access, strong input validation, and full unit tests.`
+    stack: [
+      'Golang',
+      'PostgreSQL',
+      'Redis',
+      'Keycloak',
+      'Testcontainers',
+      'WireMock',
+      'AWS',
+      'Docker'
+    ],
+    details: `• Built Go AST-based security tests that auto-discover endpoints, categorize auth levels, and enforce permission middleware on org-scoped routes — failing CI on regressions and blocking unprotected APIs.
+• Built a reusable Testcontainers-based integration test harness adopted across services (PG, Redis, Keycloak, WireMock), achieving +80% code coverage with automated DB setup/teardown.
+• Implemented password-protected Excel export for exam results with date/patient filters, multi-DB aggregation, role-based access, and full unit tests.
+• Refactored services by unifying defaults, extracting shared utilities, and streamlining query performance for maintainability and scalability.`
   },
   {
     year: '2024',
-    title: 'Software Engineer',
-    duration: 'Dec 2024 - Mar 2025',
+    title: 'Software Engineer (Contract)',
+    duration: 'Dec 2024 – Mar 2025',
     company: 'Blotato',
-    stack: ['NextJS', 'Supabase', 'NodeJS', 'Python', 'Docker'],
-    details: `• Designed a prototype for a web based Video Editor ensuring both performance and fluidity including video filters using WebGL that uses gpu
-• Resolved several bugs, including a high-memory-consumption issue that caused completed jobs in the queue to remain active in the background.
-• Improved ElevenLabs voice integration by enabling user-configurable voice parameters (e.g., pitch, speed, tone) for subtitle transcription.
-• Developed an AI agent to analyze resolved user support tickets and app documentation (GitBook), proposing PRs to improve documentation.
-• Implemented indexing for the docs GitHub repo to enhance the AI model's context awareness of file purposes and content, along with improved caching for each agent iteration, reducing processing time for 100 conversations from a couple of hours to 15-30 minutes.`
+    stack: ['Next.js', 'Supabase', 'Node.js', 'WebGL', 'ElevenLabs', 'Python', 'Docker'],
+    details: `• Designed a web-based video editor prototype with GPU-accelerated video filters using WebGL.
+• Developed an AI agent to analyze resolved user support tickets and app documentation, proposing PRs to improve docs; implemented repo indexing to reduce agent processing time from hours to 15–30 minutes.
+• Improved ElevenLabs voice integration with user-configurable parameters (pitch, speed, tone) for subtitle transcription.
+• Resolved a high-memory-consumption bug causing completed queue jobs to remain active in background.`
   },
   {
     year: '2023',
     title: 'Software Developer',
-    duration: 'Jan 2023 - May 2024',
+    duration: 'Jan 2023 – May 2024',
     company: 'Hypefury',
-    stack: ['Vue', 'Firebase', 'Node.js', 'Google Cloud', 'Elasticsearch', 'AWS', 'Docker'],
-    details: `• Led development efforts across diverse tasks, implementing new features, resolving complex bugs, and
-enhancing overall system functionality.
-• Designed and delivered multiple high-quality services, including a robust metrics and workload tracking system for multiple applications.
-• Optimized development workflow by implementing a Nix environment, ensuring consistent dependency management across the team and streamlining the onboarding process for new developers.
-• Engineered a media rendering service utilizing FFmpeg, enabling efficient creation of short-form content for users while continuously optimizing its performance.`
+    stack: ['Vue', 'Node.js', 'FFmpeg', 'WASM', 'Nix', 'Firebase', 'Google Cloud', 'AWS'],
+    details: `• Engineered a media rendering service using FFmpeg and WASM for efficient short-form content creation.
+• Built a metrics and workload tracking system across multiple applications.
+• Optimized development workflow using Nix for consistent dependency management and streamlined onboarding.`
   },
   {
     year: '2022',
     title: 'Backend Developer',
-    duration: 'May 2022 - Aug 2022',
+    duration: 'May 2022 – Aug 2022',
     company: 'Funnelish',
-    stack: [
-      'Golang',
-      'Typescript',
-      'Node.js',
-      'Google Cloud',
-      'Elasticsearch',
-      'Docker',
-      'MySQL',
-      'Redis'
-    ],
-    details: `Funnelish.com which is a Shopify alternative written in Go with it s own custom library that s written in Go. Important parts I worked on:
-• Engineered a comprehensive backend service for managing extension installations in a client resource
-management system, handling products, sales funnels, and related assets.
-• Developed a Go/Node.js library for the backend API, enabling developers to efficiently create applications that consume the service.`
+    stack: ['Golang', 'Node.js', 'TypeScript', 'MySQL', 'Redis', 'Google Cloud', 'Docker'],
+    details: `• Engineered a backend service in Golang for managing extension installations, products, sales funnels, and assets in a client resource management system.
+• Developed a Go/Node.js library enabling third-party developers to build applications on top of the service API.`
+  },
+  {
+    year: '2021',
+    title: 'Software Engineer (Freelance)',
+    duration: 'Oct 2021 – Feb 2022',
+    company: 'Meetmeeasy',
+    stack: ['NestJS', 'Node.js', 'TypeScript', 'MySQL'],
+    details: `• Engineered a robust scheduling system using NestJS, implementing appointment management, recurring events, and complex calendar operations.
+• Developed and optimized cron jobs for automated task execution, ensuring timely updates and maintenance of scheduling data.
+• Implemented database management strategies to handle high-volume scheduling data with optimal performance using MySQL.
+• Resolved complex timezone-related issues, ensuring accurate time representation and scheduling across multiple geographical regions.`
   },
   {
     year: '2020',
     title: 'Fullstack Developer',
-    duration: 'Mar 2020 - Jul 2021',
+    duration: 'May 2020 – Jul 2021',
     company: 'Hidamek',
-    stack: ['NextJS', 'Typescript', 'Node.js', 'Golang'],
-    details: `• Developed and deployed a fully functional website utilizing cutting-edge technologies
-• Implemented robust security measures to protect website integrity and user data
-• Demonstrated proficiency in database management and optimization
-• Facilitated seamless integration between technological solutions and customer needs
-• Acquired comprehensive knowledge of web development lifecycle, including domain acquisition, creation,testing, and deployment
-• Implemented SEO strategies to enhance organic discovery and drive high-quality website traffic`
+    stack: ['Next.js', 'TypeScript', 'Node.js', 'Golang'],
+    details: `• Built and deployed a full-stack web application, implementing security measures and database optimization.`
   }
 ] satisfies TimelineItemType[];

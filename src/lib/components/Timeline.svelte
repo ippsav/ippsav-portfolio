@@ -11,7 +11,10 @@
 </script>
 
 <div role="list" aria-label="Experience timeline">
+  <div class="text-gray-500 text-[10px] font-mono mb-3 tracking-wider">
+    &gt; {data.length} RECORDS · CLICK TO EXPAND
+  </div>
   {#each data as timeline, i (`${timeline.year}-${timeline.company}`)}
-    <TimelineItem {timeline} index={i} />
+    <TimelineItem {timeline} index={i} defaultExpanded={i === 0} />
   {/each}
 </div>

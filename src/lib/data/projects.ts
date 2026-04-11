@@ -2,24 +2,31 @@ import type { ProjectItemType } from '$lib/types/shared';
 
 export default [
   {
-    title: 'Redzig',
+    title: 'Redzig / Zcached',
     description:
-      'Built a Redis clone from scratch, implementing the RESP protocol and diving deep into distributed caching. Later pivoted to Zcached, adapting to new project needs while leveraging insights from the Redis work.',
+      'Redis clone built from scratch in Zig, implementing the RESP protocol and distributed caching; pivoted to Zcached adapting the architecture to new requirements.',
     stack: ['Zig'],
     githubUrl: 'https://github.com/ippsav/redzig'
   },
   {
     title: 'Zitorrent',
     description:
-      'Crafted a BitTorrent client from the ground up, implementing Bencode parsing and seeder communication protocols. This project showcases hands-on experience with peer-to-peer networking and distributed file sharing systems.',
+      'BitTorrent client in Zig implementing Bencode parsing and seeder communication protocols, demonstrating P2P networking and distributed file sharing.',
     stack: ['Zig'],
     githubUrl: 'https://github.com/ippsav/zitorrent'
   },
   {
-    title: 'firebase-secrets-cli',
+    title: 'Bun (OSS)',
     description:
-      'A powerful command-line tool built with Rust, allowing users to easily set multiple secrets at once from a file containing key-value pairs. This eliminates the need for manual, time-consuming configuration of individual secrets, streamlining the process and simplifying the management of sensitive data in Firebase projects.',
-    stack: ['Rust'],
-    githubUrl: 'https://github.com/ippsav/firebase-secrets-cli'
+      'Contributed critical bug fixes and new features to native modules.',
+    stack: ['Zig', 'C++', 'JavaScript'],
+    githubUrl: 'https://github.com/oven-sh/bun'
+  },
+  {
+    title: 'Zig (OSS)',
+    description:
+      'Redesigned the Linux syscall generation process to simplify support for multiple architectures.',
+    stack: ['Zig'],
+    githubUrl: 'https://github.com/ziglang/zig'
   }
 ] satisfies ProjectItemType[];
