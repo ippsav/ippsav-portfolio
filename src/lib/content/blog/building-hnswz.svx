@@ -35,8 +35,7 @@ Text goes in, a model turns it into a fixed-dimension float vector
 space. Search = find the nearest vectors to a query vector. Doing this
 exactly is O(N·dim) per query, which at N = 1M and dim = 4096 is not great.
 So you use an approximate nearest-neighbor index. The one everyone uses is
-**HNSW** — Hierarchical Navigable Small World graphs. That's the "h" in
-`hnswz`.
+**HNSW** — Hierarchical Navigable Small World graphs.
 
 ## The pieces
 
