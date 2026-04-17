@@ -1,0 +1,713 @@
+---
+title: 'Building hnswz: a vector database, in Zig'
+description: What I learned building a local HNSW vector database in Zig — SIMD distance, a kqueue server, WAL durability, and beating hnswlib on my laptop.
+date: 2026-04-17
+tag: notes
+readingTime: 14 min read
+---
+
+## How it started
+
+I ran into a problem where I needed to search through a pile of local files
+semantically — not by filename, not by `grep`, but by meaning. "Find me
+that thing I read about compaction last month" sort of search.
+
+The path of least resistance is to pipe everything to a hosted embedding API
+and pay by the token. I didn't want to do that. The files are on my
+laptop, the laptop can clearly do the work, and paying a cloud every time
+I poke around my own data is a weird reversal of who's supposed to be
+serving whom.
+
+The other thing I wanted was an excuse to write Zig again.
+
+So: how hard could it be to write a vector database?
+
+Turns out the ceiling on "hard" is pretty high. This post is a tour of what
+`hnswz` became — what's in it, which pieces are actually interesting, and
+which parts I'm still thinking about.
+
+> Status: work in progress. Don't point production at it.
+
+## What a vector DB is, in one paragraph
+
+Text goes in, a model turns it into a fixed-dimension float vector
+("embedding"), and similar-meaning texts end up close together in that
+space. Search = find the nearest vectors to a query vector. Doing this
+exactly is O(N·dim) per query, which at N = 1M and dim = 4096 is not great.
+So you use an approximate nearest-neighbor index. The one everyone uses is
+**HNSW** — Hierarchical Navigable Small World graphs. That's the "h" in
+`hnswz`.
+
+## The pieces
+
+<figure>
+  <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig1-title">
+    <title id="fig1-title">High-level architecture of hnswz</title>
+    <defs>
+      <pattern id="grid-1" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1f1f1f" stroke-width="0.5" />
+      </pattern>
+      <marker id="arr-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b6b" />
+      </marker>
+    </defs>
+
+    <rect width="800" height="260" fill="#0d0d0d" />
+    <rect width="800" height="260" fill="url(#grid-1)" />
+
+    <g font-family="JetBrains Mono, monospace" font-size="11" fill="#d4d4d4">
+      <!-- Files -->
+      <g transform="translate(40, 90)">
+        <rect width="110" height="80" fill="none" stroke="#2f2f2f" />
+        <text x="55" y="20" text-anchor="middle" fill="#a3a3a3" font-size="9" letter-spacing="1.5">LOCAL FILES</text>
+        <g stroke="#6b6b6b" fill="none">
+          <rect x="25" y="32" width="60" height="8" />
+          <rect x="25" y="44" width="60" height="8" />
+          <rect x="25" y="56" width="60" height="8" />
+        </g>
+      </g>
+
+      <!-- Embedder -->
+      <g transform="translate(210, 90)">
+        <rect width="150" height="80" fill="none" stroke="#2f2f2f" />
+        <text x="75" y="20" text-anchor="middle" fill="#a3a3a3" font-size="9" letter-spacing="1.5">EMBEDDER</text>
+        <text x="75" y="46" text-anchor="middle" fill="#c4a5ff">Ollama</text>
+        <text x="75" y="64" text-anchor="middle" fill="#525252" font-size="10">text → []f32</text>
+      </g>
+
+      <!-- Vector DB -->
+      <g transform="translate(420, 60)">
+        <rect width="200" height="140" fill="none" stroke="#2f2f2f" stroke-dasharray="2 2" />
+        <text x="100" y="18" text-anchor="middle" fill="#a3a3a3" font-size="9" letter-spacing="1.5">hnswz</text>
+
+        <g transform="translate(20, 36)">
+          <rect width="160" height="36" fill="none" stroke="#2f2f2f" />
+          <text x="80" y="15" text-anchor="middle" fill="#525252" font-size="9" letter-spacing="1.5">VECTOR STORE</text>
+          <text x="80" y="28" text-anchor="middle" fill="#a8cfa1" font-size="10">[]f32 · tombstones</text>
+        </g>
+
+        <g transform="translate(20, 84)">
+          <rect width="160" height="36" fill="none" stroke="#2f2f2f" />
+          <text x="80" y="15" text-anchor="middle" fill="#525252" font-size="9" letter-spacing="1.5">HNSW GRAPH</text>
+          <text x="80" y="28" text-anchor="middle" fill="#9fc5e8" font-size="10">layered · navigable</text>
+        </g>
+      </g>
+
+      <!-- Results -->
+      <g transform="translate(680, 90)">
+        <rect width="90" height="80" fill="none" stroke="#2f2f2f" />
+        <text x="45" y="20" text-anchor="middle" fill="#a3a3a3" font-size="9" letter-spacing="1.5">RESULTS</text>
+        <g font-size="10" fill="#e8b87d">
+          <text x="14" y="40">1.</text>
+          <text x="26" y="40" fill="#d4d4d4">doc_a</text>
+          <text x="14" y="54">2.</text>
+          <text x="26" y="54" fill="#d4d4d4">doc_c</text>
+          <text x="14" y="68">3.</text>
+          <text x="26" y="68" fill="#d4d4d4">doc_b</text>
+        </g>
+      </g>
+
+      <!-- Arrows -->
+      <g stroke="#6b6b6b" stroke-width="1" fill="none">
+        <line x1="150" y1="130" x2="206" y2="130" marker-end="url(#arr-1)" />
+        <line x1="360" y1="130" x2="416" y2="130" marker-end="url(#arr-1)" />
+        <line x1="620" y1="130" x2="676" y2="130" marker-end="url(#arr-1)" />
+      </g>
+    </g>
+  </svg>
+  <figcaption>Fig. 01 — File text is embedded, stored, indexed, and ranked.</figcaption>
+</figure>
+
+There are a few building blocks I needed before the interesting part:
+
+- a **vector store** — a big flat `[]f32` of dim × capacity, with tombstones
+  and a free list so deletes don't fragment
+- a **distance function** — cosine / dot, but fast
+- an **embedder** — something to turn text into those vectors; I use
+  [Ollama](https://ollama.com) locally
+- a **graph index** — HNSW, where the actual work happens
+
+I'll skim the first three and spend real time on HNSW and the server.
+
+### Storage
+
+Flat, contiguous, 64-byte aligned, allocated once. `dim` is a runtime field
+set from config, not a comptime parameter — I want one binary, many
+configurations. Deletes mark a tombstone bit and push the slot onto a
+free-list; the next `add` pops from that LIFO before bumping the
+high-water mark. That's all it is.
+
+### Distance, SIMD
+
+Zig's `@Vector` makes the SIMD dot product basically free to write:
+
+```zig
+const VecLen = std.simd.suggestVectorLength(f32) orelse 4;
+const Vec4 = @Vector(VecLen, f32);
+
+pub fn dot(a: []const f32, b: []const f32) f32 {
+    var acc: Vec4 = @splat(0);
+    var i: usize = 0;
+    while (i + VecLen <= a.len) : (i += VecLen) {
+        const va: Vec4 = a[i..][0..VecLen].*;
+        const vb: Vec4 = b[i..][0..VecLen].*;
+        acc += va * vb;
+    }
+    var sum: f32 = @reduce(.Add, acc);
+    while (i < a.len) : (i += 1) sum += a[i] * b[i];
+    return sum;
+}
+```
+
+`std.simd.suggestVectorLength` asks the target what lane-width it wants, so
+I don't bake a number in. On Apple Silicon that's 4 × f32; a modern x86
+would be 8 or 16. One file, portable, no intrinsics.
+
+Cosine distance is `1 - dot(a,b) / (||a|| · ||b||)`. If the caller
+normalizes vectors on the way in, we skip the norms at query time — the
+hot path becomes a single dot product.
+
+### Embedder
+
+A tiny vtable interface (`embed(text, out)`) with an Ollama implementation
+behind it. All buffers preallocated at startup — no allocations on the
+request path. That's a pattern you'll see repeated everywhere in this
+project, because it's what lets you reason about memory.
+
+## HNSW — the actual core
+
+This is the part worth zooming in on.
+
+The idea: build a layered graph where the bottom layer (layer 0) contains
+every vector and is densely connected, and each layer above is a
+progressively sparser sampling. To search, you enter at the top, greedily
+hop toward the query at each level, and when you hit the bottom you run a
+**beam search** to collect the final neighbors.
+
+<figure>
+  <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig2-title">
+    <title id="fig2-title">HNSW layered graph with a search path descending to the query</title>
+    <defs>
+      <pattern id="grid-2" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1f1f1f" stroke-width="0.5" />
+      </pattern>
+      <marker id="arr-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#c4a5ff" />
+      </marker>
+    </defs>
+
+    <rect width="800" height="380" fill="#0d0d0d" />
+    <rect width="800" height="380" fill="url(#grid-2)" />
+
+    <g font-family="JetBrains Mono, monospace" font-size="10" fill="#525252">
+      <text x="30" y="60">LAYER 2</text>
+      <text x="30" y="180">LAYER 1</text>
+      <text x="30" y="300">LAYER 0</text>
+    </g>
+
+    <!-- Layer 2: sparse, 3 nodes -->
+    <g transform="translate(0, 50)">
+      <g stroke="#2f2f2f">
+        <line x1="200" y1="20" x2="440" y2="20" />
+        <line x1="440" y1="20" x2="640" y2="20" />
+      </g>
+      <circle cx="200" cy="20" r="5" fill="#c4a5ff" />
+      <circle cx="440" cy="20" r="4" fill="none" stroke="#6b6b6b" />
+      <circle cx="640" cy="20" r="4" fill="none" stroke="#6b6b6b" />
+      <text x="200" y="8" font-family="JetBrains Mono, monospace" font-size="9" fill="#c4a5ff" text-anchor="middle">enter</text>
+    </g>
+
+    <!-- Layer 1: medium, 5 nodes — path visits x=320 and x=480 -->
+    <g transform="translate(0, 170)">
+      <g stroke="#2f2f2f">
+        <line x1="160" y1="20" x2="320" y2="20" />
+        <line x1="320" y1="20" x2="480" y2="20" />
+        <line x1="480" y1="20" x2="600" y2="20" />
+        <line x1="600" y1="20" x2="720" y2="20" />
+      </g>
+      <g stroke="#6b6b6b" fill="none">
+        <circle cx="160" cy="20" r="4" />
+        <circle cx="600" cy="20" r="4" />
+        <circle cx="720" cy="20" r="4" />
+      </g>
+      <!-- highlighted on search path -->
+      <circle cx="320" cy="20" r="5" fill="#c4a5ff" />
+      <circle cx="480" cy="20" r="5" fill="#c4a5ff" />
+    </g>
+
+    <!-- Layer 0: dense, single row — query sits on node at (480, 20) -->
+    <g transform="translate(0, 290)">
+      <g stroke="#2f2f2f">
+        <!-- adjacent chain -->
+        <line x1="80"  y1="20" x2="160" y2="20" />
+        <line x1="160" y1="20" x2="240" y2="20" />
+        <line x1="240" y1="20" x2="320" y2="20" />
+        <line x1="320" y1="20" x2="400" y2="20" />
+        <line x1="400" y1="20" x2="480" y2="20" />
+        <line x1="480" y1="20" x2="560" y2="20" />
+        <line x1="560" y1="20" x2="640" y2="20" />
+        <line x1="640" y1="20" x2="720" y2="20" />
+        <!-- skip edges for the "dense" feel -->
+        <path d="M 160 20 Q 240 2 320 20" fill="none" />
+        <path d="M 400 20 Q 480 2 560 20" fill="none" />
+        <path d="M 560 20 Q 640 2 720 20" fill="none" />
+        <path d="M 240 20 Q 320 42 400 20" fill="none" />
+        <path d="M 480 20 Q 560 42 640 20" fill="none" />
+      </g>
+
+      <!-- regular nodes -->
+      <g fill="none" stroke="#6b6b6b">
+        <circle cx="80"  cy="20" r="3.5" />
+        <circle cx="160" cy="20" r="3.5" />
+        <circle cx="240" cy="20" r="3.5" />
+        <circle cx="320" cy="20" r="3.5" />
+        <circle cx="640" cy="20" r="3.5" />
+        <circle cx="720" cy="20" r="3.5" />
+      </g>
+
+      <!-- beam nodes (closest neighbors to query) -->
+      <g fill="#a8cfa1">
+        <circle cx="400" cy="20" r="4.5" />
+        <circle cx="560" cy="20" r="4.5" />
+      </g>
+
+      <!-- query sits on node at (480, 20) -->
+      <circle cx="480" cy="20" r="7" fill="#0d0d0d" stroke="#e8b87d" stroke-width="1.5" />
+      <text x="480" y="48" text-anchor="middle" fill="#e8b87d" font-family="JetBrains Mono, monospace" font-size="10">query</text>
+    </g>
+
+    <!-- Descent path: 200 (layer 2) → 320 (layer 1) → 480 (layer 1) → 480 (layer 0, the query) -->
+    <g stroke="#c4a5ff" stroke-width="1.5" fill="none" stroke-dasharray="4 3">
+      <line x1="200" y1="72" x2="320" y2="188" marker-end="url(#arr-2)" />
+      <line x1="320" y1="192" x2="480" y2="192" marker-end="url(#arr-2)" />
+      <line x1="480" y1="196" x2="480" y2="302" marker-end="url(#arr-2)" />
+    </g>
+  </svg>
+  <figcaption>Fig. 02 — Entry at the top; greedy descent through layers; beam search at layer 0.</figcaption>
+</figure>
+
+### Picking a level
+
+When a new vector comes in, you pick the highest layer it lives on by
+sampling from a geometric distribution. Most vectors get level 0 (bottom
+only); very few climb high. This is where the "hierarchical" part comes
+from:
+
+```zig
+pub fn randomLevel(self: *Self) u8 {
+    const uni = 1.0 - random.float(f64);     // (0, 1]
+    const l: f64 = @floor(-@log(uni) * ml);  // ml = 1 / ln(M)
+    return @intFromFloat(@min(l, MAX_LEVEL));
+}
+```
+
+`M` is the graph fan-out (neighbors per node per layer). With `M=16` the
+expected layer-above share is `1/16`, which is exactly what makes "enter
+at the top, descend" cheap: upper layers are small, so the greedy phase
+touches a handful of nodes.
+
+### Beam search on layer 0
+
+Once greedy descent lands us on a decent entry node at layer 0, we switch
+to beam search with a fixed width `ef`:
+
+- a **min-heap of candidates** to expand next (closest-first)
+- a **max-heap of results** of size `ef` (farthest-of-the-best on top, so
+  we can evict in O(log ef))
+- a **visited set** (bitset over the max-vector capacity)
+
+Pop the closest candidate. If it's already worse than the worst result
+we've got, stop. Otherwise expand its neighbors, push any unseen one onto
+candidates, and if it beats the current worst result, replace it.
+
+<figure>
+  <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig3-title">
+    <title id="fig3-title">Beam search frontier on layer 0 around a query vector</title>
+    <defs>
+      <pattern id="grid-3" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1f1f1f" stroke-width="0.5" />
+      </pattern>
+    </defs>
+
+    <rect width="800" height="300" fill="#0d0d0d" />
+    <rect width="800" height="300" fill="url(#grid-3)" />
+
+    <!-- Unvisited nodes (far, dim) -->
+    <g fill="#2f2f2f">
+      <circle cx="120" cy="70"  r="3" />
+      <circle cx="200" cy="40"  r="3" />
+      <circle cx="680" cy="60"  r="3" />
+      <circle cx="720" cy="170" r="3" />
+      <circle cx="140" cy="210" r="3" />
+      <circle cx="80"  cy="140" r="3" />
+      <circle cx="650" cy="210" r="3" />
+      <circle cx="560" cy="50"  r="3" />
+    </g>
+
+    <!-- Visited nodes (already expanded, outlined) -->
+    <g fill="none" stroke="#525252">
+      <circle cx="260" cy="90"  r="4" />
+      <circle cx="510" cy="100" r="4" />
+      <circle cx="270" cy="180" r="4" />
+      <circle cx="520" cy="190" r="4" />
+    </g>
+
+    <!-- Candidate frontier (blue) -->
+    <g fill="#9fc5e8">
+      <circle cx="340" cy="80"  r="5" />
+      <circle cx="460" cy="200" r="5" />
+      <circle cx="320" cy="195" r="5" />
+    </g>
+
+    <!-- Results set (sage, closest) -->
+    <g fill="#a8cfa1">
+      <circle cx="370" cy="130" r="5" />
+      <circle cx="430" cy="120" r="5" />
+      <circle cx="400" cy="170" r="5" />
+    </g>
+
+    <!-- Query -->
+    <circle cx="400" cy="145" r="7" fill="#0d0d0d" stroke="#e8b87d" stroke-width="1.5" />
+    <text x="400" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#e8b87d">query</text>
+
+    <!-- Legend -->
+    <g font-family="JetBrains Mono, monospace" font-size="10" fill="#a3a3a3" transform="translate(120, 270)">
+      <g>
+        <circle cx="0" cy="-3" r="4" fill="#a8cfa1" />
+        <text x="12" y="1">results</text>
+      </g>
+      <g transform="translate(130, 0)">
+        <circle cx="0" cy="-3" r="4" fill="#9fc5e8" />
+        <text x="12" y="1">candidates</text>
+      </g>
+      <g transform="translate(290, 0)">
+        <circle cx="0" cy="-3" r="4" fill="none" stroke="#525252" />
+        <text x="12" y="1">visited</text>
+      </g>
+      <g transform="translate(410, 0)">
+        <circle cx="0" cy="-3" r="3" fill="#2f2f2f" />
+        <text x="12" y="1">unvisited</text>
+      </g>
+    </g>
+  </svg>
+  <figcaption>Fig. 03 — The frontier tightens around the query; results (sage) stay closest, candidates (blue) wait to be expanded.</figcaption>
+</figure>
+
+Every buffer the search touches — the two heaps, the visited bitset, a few
+scratch slices — lives inside a `Workspace` struct that's sized once at
+startup and handed out from a per-worker pool. No `alloc` on the hot path.
+That's how you get predictable p99 latencies.
+
+### The neighbor-selection heuristic
+
+When a new node connects, you don't just take the `M` closest candidates
+— that over-clusters. The paper's heuristic is "prefer diverse
+directions": accept a candidate only if it's closer to the new node than
+to any already-accepted neighbor. This keeps the graph well-connected
+across the space instead of collapsing into a few dense regions.
+
+### Deletes without rebuilding
+
+HNSW doesn't want you to delete. The standard answer is "just tombstone
+it, keep it as a routing hop, skip it in results." That's what I do —
+with one wrinkle. Each node has some number of upper-layer slots
+(literally zero for level-0 nodes, more for high-level ones). When a node
+dies, its slot run goes into a free-list keyed by run length, and the
+next insert that sampled the same level pops from that bucket first
+before bumping the arena cursor. Exact-match only, no splitting. Works
+because insert and delete sample the same distribution, so the buckets
+stay balanced in expectation.
+
+## From a script to a server
+
+Original flow was:
+
+```text
+hnswz build ./docs     # embed every .txt, build graph, save to disk
+hnswz query            # REPL: ask questions, get filenames back
+```
+
+Perfect for my folder-of-notes use case. Breaks the moment I want to
+insert or delete a single document without reindexing the whole corpus.
+So I added `serve` — a long-running process speaking a custom binary
+TCP protocol.
+
+### Why binary
+
+A single vector at `dim=4096` is 16 KiB of raw floats. Framing that as
+JSON would mean stringifying 4096 numbers per call, on both sides, for
+no reason. The wire format is dull on purpose:
+
+```text
+request frame:
+  u32   body_len
+  u8    opcode
+  u32   req_id
+  []    opcode-specific payload
+```
+
+Nine bytes of header, little-endian throughout, matching the on-disk
+formats so serialization is the same code everywhere. `req_id` is echoed
+in the response, so pipelined/async clients work without a format break.
+Full spec lives in `src/protocol.zig`.
+
+### The concurrency story
+
+This is the part where naive designs get embarrassing.
+
+At `dim=4096`, a single HNSW insert takes ~19 ms and a search ~4 ms on
+my laptop. Run that synchronously on the event-loop thread and every
+request stalls every other client. So the architecture is:
+
+- **Main thread:** a `kqueue` reactor
+  (`src/io/darwin.zig`) — accepts connections, runs
+  the per-connection state machine (`read_header → read_body → dispatch
+  → write_response`), and hands requests off.
+- **Worker pool** (`src/dispatcher.zig`): N
+  threads, each with its own HNSW `Workspace` and scratch. A
+  `std.Thread.RwLock` guards the `{store, index, metadata}` triple.
+  Searches hold it shared. Inserts/deletes/replace/snapshot hold it
+  exclusive.
+- **Wakeups:** workers post finished requests onto a done queue and
+  write one byte to a `pipe(2)`. The main loop has the pipe's read end
+  registered as a `readReady` completion, so it wakes on that and drains
+  the queue. No polling, no timers.
+
+<figure>
+  <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig4-title">
+    <title id="fig4-title">Server concurrency architecture: kqueue main thread, worker pool, pipe wake-up</title>
+    <defs>
+      <pattern id="grid-4" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1f1f1f" stroke-width="0.5" />
+      </pattern>
+      <marker id="arr-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b6b" />
+      </marker>
+      <marker id="arr-4-wake" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#e8b87d" />
+      </marker>
+    </defs>
+
+    <rect width="800" height="380" fill="#0d0d0d" />
+    <rect width="800" height="380" fill="url(#grid-4)" />
+
+    <g font-family="JetBrains Mono, monospace" fill="#d4d4d4">
+      <!-- Main thread row -->
+      <text x="80" y="50" fill="#a3a3a3" font-size="10" letter-spacing="1.5">MAIN THREAD</text>
+
+      <g transform="translate(80, 64)">
+        <g>
+          <rect width="120" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="60" y="30" text-anchor="middle" fill="#d4d4d4" font-size="11">accept</text>
+        </g>
+        <g transform="translate(140, 0)">
+          <rect width="120" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="60" y="30" text-anchor="middle" fill="#d4d4d4" font-size="11">read</text>
+        </g>
+        <g transform="translate(280, 0)">
+          <rect width="120" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="60" y="30" text-anchor="middle" fill="#c4a5ff" font-size="11">dispatch</text>
+        </g>
+        <g transform="translate(420, 0)">
+          <rect width="120" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="60" y="30" text-anchor="middle" fill="#d4d4d4" font-size="11">write</text>
+        </g>
+      </g>
+
+      <!-- Pending queue -->
+      <g transform="translate(280, 160)">
+        <rect width="240" height="32" fill="none" stroke="#2f2f2f" />
+        <text x="120" y="20" text-anchor="middle" fill="#a3a3a3" font-size="10">pending queue</text>
+      </g>
+
+      <!-- Worker pool row -->
+      <text x="80" y="238" fill="#a3a3a3" font-size="10" letter-spacing="1.5">WORKERS · RwLock(store, index)</text>
+
+      <g transform="translate(80, 252)">
+        <g>
+          <rect width="160" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="80" y="30" text-anchor="middle" fill="#a8cfa1" font-size="11">worker 1</text>
+        </g>
+        <g transform="translate(180, 0)">
+          <rect width="160" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="80" y="30" text-anchor="middle" fill="#a8cfa1" font-size="11">worker 2</text>
+        </g>
+        <g transform="translate(360, 0)">
+          <rect width="160" height="50" fill="none" stroke="#2f2f2f" />
+          <text x="80" y="30" text-anchor="middle" fill="#a8cfa1" font-size="11">worker 3</text>
+        </g>
+      </g>
+
+      <!-- Done queue -->
+      <g transform="translate(280, 340)">
+        <rect width="240" height="32" fill="none" stroke="#2f2f2f" />
+        <text x="120" y="20" text-anchor="middle" fill="#a3a3a3" font-size="10">done queue</text>
+      </g>
+
+      <!-- Arrows -->
+      <g stroke="#6b6b6b" fill="none">
+        <line x1="400" y1="114" x2="400" y2="158" marker-end="url(#arr-4)" />
+        <line x1="400" y1="192" x2="400" y2="248" marker-end="url(#arr-4)" />
+        <line x1="400" y1="302" x2="400" y2="338" marker-end="url(#arr-4)" />
+      </g>
+
+      <!-- Pipe wake-up loop -->
+      <g stroke="#e8b87d" stroke-width="1" stroke-dasharray="4 4" fill="none">
+        <path d="M 520 356 L 680 356 L 680 34 L 420 34 L 420 60" marker-end="url(#arr-4-wake)" />
+      </g>
+      <text x="690" y="226" fill="#e8b87d" font-size="10">pipe(2) wake</text>
+    </g>
+  </svg>
+  <figcaption>Fig. 04 — The reactor dispatches into the pool; a pipe byte wakes it when results are ready.</figcaption>
+</figure>
+
+The style is deliberately close to TigerBeetle's — caller-owned
+`Completion` objects, a `*anyopaque` context, a small tagged
+`Operation`. The difference is that TB runs everything on the loop
+thread; we can't, because our compute isn't bounded enough.
+
+### Durability: write-ahead log
+
+Every mutation is appended to a WAL and `fsync`'d before the server
+acknowledges the client. On startup the WAL is replayed on top of the
+last snapshot. Each record carries a CRC32 covering its length prefix
+and body, so a torn write at any byte boundary produces a mismatch and
+terminates replay at the last fully-valid record.
+
+Snapshots atomically truncate the WAL via rename-over-a-tempfile — so
+if the truncate itself crashes, either the old or the new WAL is intact
+on disk. Acknowledged writes survive a crash; unacknowledged ones
+don't. That's the whole contract.
+
+One trap I stepped in: the snapshot serializes vector ids from the
+store's high-water mark, but HNSW `insert` draws a level from an RNG
+that isn't part of that state. Early versions recorded the id but
+re-sampled the level during WAL replay, which produced a different
+graph than the one that had been acknowledged. The fix was to draw the
+level **before** writing the WAL record, persist it in the record, and
+feed it into `insertWithLevel` on replay. Small, boring, but the kind
+of invariant that'll silently corrupt your index if you miss it.
+
+## Numbers
+
+A turnkey comparison harness against `hnswlib` lives in
+`bench/` — downloads SIFT1M, runs both on the same bytes with
+matched parameters (`M=16`, `ef_construction=200`, `ef_search=100`,
+top-k=10), diffs the JSON reports.
+
+**SIFT1M, 1M × 128d, 10k queries, single-threaded Apple M-series:**
+
+| metric | hnswz | hnswlib |
+|---|---:|---:|
+| build wall | 358.6 s | 473.1 s |
+| build throughput | 2.8k / s | 2.1k / s |
+| search QPS | 4.6k / s | 3.5k / s |
+| search p50 | 218 µs | 291 µs |
+| search p99 | 335 µs | 393 µs |
+| recall@10 | 0.9804 | 0.9772 |
+
+Faster than `hnswlib` on every axis, identical recall. One laptop,
+single-threaded, cosine distance over L2-normalized vectors. Don't
+extrapolate to a cloud fleet; do run it on your own hardware if you
+care.
+
+<figure>
+  <svg viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig5-title">
+    <title id="fig5-title">hnswz vs hnswlib — relative performance on SIFT1M</title>
+    <defs>
+      <pattern id="grid-5" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1f1f1f" stroke-width="0.5" />
+      </pattern>
+    </defs>
+
+    <rect width="800" height="340" fill="#0d0d0d" />
+    <rect width="800" height="340" fill="url(#grid-5)" />
+
+    <g font-family="JetBrains Mono, monospace" fill="#d4d4d4">
+      <!-- Legend -->
+      <g transform="translate(260, 44)" font-size="11">
+        <rect x="0" y="-9" width="14" height="12" fill="#a8cfa1" />
+        <text x="22" y="1" fill="#d4d4d4">hnswz</text>
+        <g transform="translate(130, 0)">
+          <rect x="0" y="-9" width="14" height="12" fill="none" stroke="#6b6b6b" />
+          <text x="22" y="1" fill="#a3a3a3">hnswlib</text>
+        </g>
+      </g>
+
+      <!-- Baseline -->
+      <line x1="80" y1="260" x2="720" y2="260" stroke="#2f2f2f" />
+
+      <!-- Group 1: Build throughput — 2.8k vs 2.1k (scale 40 / k) -->
+      <g transform="translate(180, 260)">
+        <rect x="-46" y="-112" width="36" height="112" fill="#a8cfa1" />
+        <text x="-28" y="-120" text-anchor="middle" fill="#d4d4d4" font-size="11">2.8k</text>
+
+        <rect x="10" y="-84" width="36" height="84" fill="none" stroke="#6b6b6b" />
+        <text x="28" y="-92" text-anchor="middle" fill="#a3a3a3" font-size="11">2.1k</text>
+
+        <text x="0" y="22" text-anchor="middle" fill="#a3a3a3" font-size="11">build / s</text>
+        <text x="0" y="38" text-anchor="middle" fill="#525252" font-size="10" font-style="italic">higher better</text>
+      </g>
+
+      <!-- Group 2: Search QPS — 4.6k vs 3.5k -->
+      <g transform="translate(400, 260)">
+        <rect x="-46" y="-184" width="36" height="184" fill="#a8cfa1" />
+        <text x="-28" y="-192" text-anchor="middle" fill="#d4d4d4" font-size="11">4.6k</text>
+
+        <rect x="10" y="-140" width="36" height="140" fill="none" stroke="#6b6b6b" />
+        <text x="28" y="-148" text-anchor="middle" fill="#a3a3a3" font-size="11">3.5k</text>
+
+        <text x="0" y="22" text-anchor="middle" fill="#a3a3a3" font-size="11">search qps</text>
+        <text x="0" y="38" text-anchor="middle" fill="#525252" font-size="10" font-style="italic">higher better</text>
+      </g>
+
+      <!-- Group 3: Search p50 — 218 vs 291 (scale 0.45 / µs) -->
+      <g transform="translate(620, 260)">
+        <rect x="-46" y="-98" width="36" height="98" fill="#a8cfa1" />
+        <text x="-28" y="-106" text-anchor="middle" fill="#d4d4d4" font-size="11">218µs</text>
+
+        <rect x="10" y="-131" width="36" height="131" fill="none" stroke="#6b6b6b" />
+        <text x="28" y="-139" text-anchor="middle" fill="#a3a3a3" font-size="11">291µs</text>
+
+        <text x="0" y="22" text-anchor="middle" fill="#a3a3a3" font-size="11">search p50</text>
+        <text x="0" y="38" text-anchor="middle" fill="#525252" font-size="10" font-style="italic">lower better</text>
+      </g>
+    </g>
+  </svg>
+  <figcaption>Fig. 05 — SIFT1M · 1M × 128d · 10k queries · single-threaded. Recall@10 within 0.003 of each other.</figcaption>
+</figure>
+
+The honest caveat: hnswlib parallelizes `add_items` natively and hnswz's
+writer path still serializes. That's the obvious next thing.
+
+## What I learned
+
+- Zig's `@Vector` gives you portable SIMD in a few lines, no intrinsics.
+- Being explicit about allocation turns out to be a superpower for a
+  database. Every buffer has a known size, a known owner, a known
+  lifetime.
+- The hard parts weren't the HNSW algorithm. The HNSW paper is short and
+  the pseudocode translates cleanly. The hard parts were the things
+  around it: the WAL invariants, the kqueue state machine, making sure
+  the id-space stays consistent across snapshot-then-replay.
+- Building your own thing is always more work than you estimate, and
+  always worth it anyway.
+
+## What's next
+
+- **Multi-threaded ingest.** Single-writer today. Not a fundamental
+  limit — just the obvious next investment.
+- **Richer metadata.** Right now a vector is `(id, filename)`. I want
+  arbitrary payloads attached to each record without bloating the hot
+  path.
+- **Linux backend.** I built this for my own use on a Mac, so the
+  reactor is kqueue-only. Next up: spin up a Linux VM and port the I/O
+  layer to `io_uring`.
+- **A real REPL mode.** Today's REPL loads a pre-built index + vectors
+  from disk and you just type text to get results back. I want to
+  replace it with a REPL that connects to the server and speaks the
+  wire protocol — so you can drive any opcode, not just search.
+
+If you want to poke at it, source is on the repo — `zig build` gets you
+a binary, `bench/run.sh siftsmall` runs a 20-second smoke test against
+`hnswlib`. Feedback welcome; bug reports more welcome.

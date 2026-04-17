@@ -16,3 +16,18 @@ export type ProjectItemType = {
   stack: string[];
   githubUrl: string;
 };
+
+export type BlogFrontmatter = {
+  title: string;
+  description: string;
+  date: string;
+  tag?: string;
+  readingTime?: string;
+  hero?: string;
+  heroAlt?: string;
+  draft?: boolean;
+};
+
+export type BlogPostMeta = BlogFrontmatter & {
+  slug: string;
+};
