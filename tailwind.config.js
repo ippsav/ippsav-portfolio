@@ -15,6 +15,7 @@ export default {
           'Arial',
           'sans-serif'
         ],
+        serif: ['Fraunces', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
       },
       colors: {
